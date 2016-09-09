@@ -48,7 +48,7 @@ class LaravelGelfLoggerServiceProvider extends ServiceProvider
      */
     private function getConfig($key)
     {
-        return $this->app['config']->get('gelf')[$key];
+        return $this->app['config']->get('gelf-logger')[$key];
     }
 
     /**
