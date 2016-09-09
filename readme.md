@@ -24,13 +24,13 @@ composer require hedii/laravel-gelf-logger
 Add it to your providers array in `config/app.php`:
 
 ```php
-Hedii\LaravelGelfLogger\LaravelGelfLoggerProvider::class
+Hedii\LaravelGelfLogger\LaravelGelfLoggerServiceProvider::class
 ```
 
 Publish the configuration file:
 
 ```sh
-php artisan vendor:publish --provider="Hedii\LaravelGelfLogger\LaravelGelfLoggerProvider"
+php artisan vendor:publish --provider="Hedii\LaravelGelfLogger\LaravelGelfLoggerServiceProvider"
 ```
 
 See the content of the published configuration file in `config/gelf-logger.php` if you want to change the defaults.
