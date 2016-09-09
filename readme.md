@@ -30,7 +30,7 @@ Hedii\LaravelGelfLogger\GelfLoggerServiceProvider::class
 Publish the configuration file:
 
 ```sh
-php artisan vendor:publish --provider="Hedii\LaravelGelfLogger\GelfLoggerServiceProvider"
+php artisan vendor:publish --provider="Hedii\LaravelGelfLogger\LaravelGelfLoggerProvider"
 ```
 
 See the content of the published configuration file in `config/gelf-logger.php` if you want to change the defaults.
@@ -60,7 +60,6 @@ gelf()->alert('There was a foo in bar', ['foo' => 'bar']);
 ```
 
 ```php
-<?php
 try {
     throw new \Exception('test exception');
 } catch (\Exception $e) {
