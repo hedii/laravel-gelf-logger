@@ -16,4 +16,9 @@ class GelfLoggerTest extends TestCase
     {
         $this->assertInstanceOf(Logger::class, gelf());
     }
+
+    public function test_it_should_have_a_facade()
+    {
+        $this->assertTrue(class_exists(\GelfLogger::class));
+    }
 }

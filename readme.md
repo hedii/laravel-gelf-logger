@@ -27,6 +27,12 @@ Add it to your providers array in `config/app.php`:
 Hedii\LaravelGelfLogger\LaravelGelfLoggerServiceProvider::class
 ```
 
+If you want to use the facade, add it to your aliases array in `config/app.php`:
+
+```php
+'GelfLogger' => \Hedii\LaravelGelfLogger\Facades\GelfLogger::class
+```
+
 Publish the configuration file:
 
 ```sh
