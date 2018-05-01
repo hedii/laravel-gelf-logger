@@ -4,6 +4,7 @@ namespace Hedii\LaravelGelfLogger;
 
 use Gelf\Logger;
 use Gelf\Publisher;
+use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\UdpTransport;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,12 +27,11 @@ class LaravelGelfLoggerServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/config/gelf-logger.php', 'gelf-logger');
 
-        $publisher = new Publisher(
-            new UdpTransport(
-                $this->getConfig('host'),
-                $this->getConfig('port')
-            )
+        $transport = new IgnoreErrorTransportWrapper(
+            new UdpTransport($this->getConfig('host'), $this->getConfig('port'))
         );
+
+        $publisher = new Publisher($transport);
 
         $this->app->instance(GelfLogger::class, new Logger($publisher));
 
