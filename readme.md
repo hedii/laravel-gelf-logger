@@ -6,6 +6,8 @@ A package to send [gelf](http://docs.graylog.org/en/2.1/pages/gelf.html) logs to
 
 It uses the new [Laravel custom log channel](https://laravel.com/docs/master/logging) introduced in Laravel 5.6.
 
+A gelf receiver like graylog2 must be configured to receive messages with a GELF UDP Input.
+
 ## Table of contents
 
 - [Table of contents](#table-of-contents)
