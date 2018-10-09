@@ -2,7 +2,9 @@
 
 # Laravel Gelf Logger
 
-A package to send [gelf](http://docs.graylog.org/en/2.1/pages/gelf.html) logs to a gelf compatible backend like graylog. It is a laravel wrapper for [bzikarsky/gelf-php](https://github.com/bzikarsky/gelf-php) package.
+A package to send [gelf](http://docs.graylog.org/en/2.1/pages/gelf.html) logs to a gelf compatible backend like graylog. It is a Laravel wrapper for [bzikarsky/gelf-php](https://github.com/bzikarsky/gelf-php) package.
+
+It uses the new [Laravel custom log channel](https://laravel.com/docs/master/logging) introduced in Laravel 5.6.
 
 ## Table of contents
 
@@ -21,58 +23,64 @@ Install via [composer](https://getcomposer.org/doc/00-intro.md)
 composer require hedii/laravel-gelf-logger
 ```
 
-Add it to your providers array in `config/app.php`:
+Edit `config/logging.php` to add the new `gelf` log channel.
 
 ```php
-Hedii\LaravelGelfLogger\LaravelGelfLoggerServiceProvider::class
-```
+return [
+    'default' => env('LOG_CHANNEL', 'stack'),
 
-If you want to use the facade, add it to your aliases array in `config/app.php`:
+    'channels' => [
+        // You can use the gelf log channel with the stack log channel
+        'stack' => [
+            'driver' => 'stack',
+            'channels' => ['daily', 'gelf'],
+        ],
 
-```php
-'GelfLogger' => \Hedii\LaravelGelfLogger\Facades\GelfLogger::class
-```
+        // other log channels...
 
-Publish the configuration file:
+        'gelf' => [
+            'driver' => 'custom',
 
-```sh
-php artisan vendor:publish --provider="Hedii\LaravelGelfLogger\LaravelGelfLoggerServiceProvider"
-```
+            'via' => \Hedii\LaravelGelfLogger\GelfLoggerFactory::class,
 
-See the content of the published configuration file in `config/gelf-logger.php` if you want to change the defaults.
+            // This optional option determines the minimum "level" a message
+            // must be in order to be logged by the channel. Default is 'debug'
+            'level' => 'debug',
 
-```php
-/**
- * The ip address of the log server. If the value below is null,
- * the default value '127.0.0.1' will be used.
- */
-'host' => null,
+            // This optional option determines the channel name sent with the
+            // message in the 'facility' field. Default is equal to app.env
+            // configuration value
+            'name' => 'my-custom-name',
 
-/**
- * The udp port of the log server. If the value below is null,
- * the default value 12201 will be used.
- */
-'port' => null
+            // This optional option determines the host that will receive the
+            // gelf log messages. Default is 127.0.0.1
+            'host' => '127.0.0.1',
+
+            // This optional option determines the port on which the gelf
+            // receiver host is listening. Default is 12201
+            'port' => 12201,
+        ],
+    ],
+];
 ```
 
 ## Usage
 
-See the [bzikarsky/gelf-php](https://github.com/bzikarsky/gelf-php/tree/master/examples) examples in his repo to find the available methods for the `gelf()` function.
+Once you have modified the Laravel logging configuration, you can use the gelf log channel [as any Laravel log channel](https://laravel.com/docs/master/logging#writing-log-messages).
 
 ### Example
 
 ```php
-gelf()->alert('There was a foo in bar', ['foo' => 'bar']);
-```
+// Explicitly use the gelf channel
+Log::channel('gelf')->debug($message, ['foo' => 'bar']);
+Log::channel('gelf')->emergency($message, ['foo' => 'bar']);
 
-```php
-try {
-    throw new \Exception('test exception');
-} catch (\Exception $e) {
-    gelf()->emergency('Exception example', [
-        'exception' => $e
-    ]);
-}
+// In case of a stack log channel containing the gelf log channel and stack
+// configured as the default log channel
+Log::notice($message, ['foo' => 'bar']);
+
+// Using the logger helper
+logger($message, $context);
 ```
 
 ## Testing
