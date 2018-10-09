@@ -2,23 +2,50 @@
 
 namespace Hedii\LaravelGelfLogger\Tests;
 
-use Gelf\Logger;
-use Hedii\LaravelGelfLogger\GelfLogger;
+use Hedii\LaravelGelfLogger\GelfLoggerFactory;
+use Illuminate\Support\Facades\Log;
+use Monolog\Formatter\GelfMessageFormatter;
+use Monolog\Handler\GelfHandler;
+use Monolog\Logger;
+use Orchestra\Testbench\TestCase as Orchestra;
 
-class GelfLoggerTest extends TestCase
+class GelfLoggerTest extends Orchestra
 {
-    public function test_it_should_return_a_logger_instance()
+    /**
+     * Define environment setup.
+     *
+     * @param \Illuminate\Foundation\Application $app
+     */
+    protected function getEnvironmentSetUp($app): void
     {
-        $this->assertInstanceOf(Logger::class, new GelfLogger());
+        $app['config']->set('logging.default', 'gelf');
+        $app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'level' => 'notice',
+            'name' => 'my-custom-name',
+            'host' => '127.0.0.2',
+            'port' => 12202
+        ]);
     }
 
-    public function test_it_should_return_a_logger_instance_when_the_helper_is_used()
+    /** @test */
+    public function it_should_have_a_gelf_log_channel(): void
     {
-        $this->assertInstanceOf(Logger::class, gelf());
-    }
+        /** @var \Illuminate\Log\Logger $handler */
+        $logger = Log::channel('gelf');
 
-    public function test_it_should_have_a_facade()
-    {
-        $this->assertTrue(class_exists(\GelfLogger::class));
+        $this->assertInstanceOf(Logger::class, $logger->getLogger());
+        $this->assertSame($logger->getName(), 'my-custom-name');
+        $this->assertCount(1, $logger->getHandlers());
+
+        /** @var \Monolog\Handler\GelfHandler $handler */
+        $handler = $logger->getHandlers()[0];
+
+        $this->assertInstanceOf(GelfHandler::class, $handler);
+        $this->assertSame(Logger::NOTICE, $handler->getLevel());
+        $this->assertInstanceOf(GelfMessageFormatter::class, $handler->getFormatter());
+
+        // cannot test publisher and transport... :(
     }
 }

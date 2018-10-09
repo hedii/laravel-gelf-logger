@@ -1,36 +1,38 @@
 {
     "name": "hedii/laravel-gelf-logger",
-    "description": "A package to send logs to a gelf compatible backend like graylog",
+    "description": "A Laravel package to send logs to a gelf compatible backend like graylog",
     "type": "library",
     "license": "MIT",
     "keywords": [
         "hedii",
         "laravel-gelf",
         "gelf",
+        "udp",
+        "log",
+        "logging",
         "graylog",
+        "graylog2",
         "laravel",
         "php"
     ],
     "authors": [
         {
             "name": "hedii",
-            "email": "hedi.chaibs@gmail.com",
             "homepage": "https://hedichaibi.com"
         }
     ],
     "support": {
         "issues": "https://github.com/hedii/laravel-gelf-logger/issues",
-        "source": "https://github.com/hedii/laravel-gelf-logger",
-        "email": "hedi.chaibs@gmail.com"
+        "source": "https://github.com/hedii/laravel-gelf-logger"
     },
     "require": {
-        "php": ">=7.0",
-        "illuminate/support": "~5.2.0|~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0",
+        "php": "^7.1.3",
+        "illuminate/log": "5.6.*|5.7.*",
         "graylog2/gelf-php": "^1.5"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.5",
-        "orchestra/testbench": "^3.3"
+        "phpunit/phpunit": "^7.0",
+        "orchestra/testbench": "^3.7"
     },
     "autoload": {
         "psr-4": {
@@ -44,15 +46,5 @@
     },
     "scripts": {
         "test": "vendor/bin/phpunit"
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Hedii\\LaravelGelfLogger\\LaravelGelfLoggerServiceProvider"
-            ],
-            "aliases": {
-                "GelfLogger": "Hedii\\LaravelGelfLogger\\Facades\\GelfLogger"
-            }
-        }
     }
 }
