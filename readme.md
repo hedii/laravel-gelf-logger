@@ -44,6 +44,17 @@ return [
             'driver' => 'custom',
 
             'via' => \Hedii\LaravelGelfLogger\GelfLoggerFactory::class,
+            
+            // This optional option determines the processors that should be
+            // pushed to the handler. This option is useful to modify a field
+            // in the log context (see NullStringProcessor), or to add extra
+            // data. Each processor must be a callable or an object with an
+            // __invoke method: see monolog documentation about processors.
+            // Default is an empty array.
+            'processors' => [
+                \Hedii\LaravelGelfLogger\Processors\NullStringProcessor::class,
+                \Foo\Bar\AnotherProcessor::class,
+            ],
 
             // This optional option determines the minimum "level" a message
             // must be in order to be logged by the channel. Default is 'debug'

@@ -5,6 +5,7 @@ namespace Hedii\LaravelGelfLogger;
 use Gelf\Publisher;
 use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\UdpTransport;
+use Illuminate\Foundation\Application;
 use InvalidArgumentException;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
@@ -12,6 +13,13 @@ use Monolog\Logger;
 
 class GelfLoggerFactory
 {
+    /**
+     * The application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
     /**
      * The Log levels.
      *
@@ -27,6 +35,16 @@ class GelfLoggerFactory
         'alert' => Logger::ALERT,
         'emergency' => Logger::EMERGENCY,
     ];
+
+    /**
+     * GelfLoggerFactory constructor.
+     *
+     * @param \Illuminate\Foundation\Application $app
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
 
     /**
      * Create a custom Monolog instance.
@@ -47,6 +65,10 @@ class GelfLoggerFactory
 
         $handler->setFormatter(new GelfMessageFormatter(null, null, null));
 
+        foreach ($this->parseProcessors($config) as $processor) {
+            $handler->pushProcessor(new $processor);
+        }
+
         return new Logger($this->parseChannel($config), [$handler]);
     }
 
@@ -66,6 +88,25 @@ class GelfLoggerFactory
         }
 
         throw new InvalidArgumentException('Invalid log level.');
+    }
+
+    /**
+     * Extract the processors from the given configuration.
+     *
+     * @param array $config
+     * @return array
+     */
+    protected function parseProcessors(array $config): array
+    {
+        $processors = [];
+
+        if (isset($config['processors']) && is_array($config['processors'])) {
+            foreach ($config['processors'] as $processor) {
+                $processors[] = $processor;
+            }
+        }
+
+        return $processors;
     }
 
     /**
@@ -90,6 +131,6 @@ class GelfLoggerFactory
      */
     protected function getFallbackChannelName(): string
     {
-        return app()->bound('env') ? app()->environment() : 'production';
+        return $this->app->bound('env') ? $this->app->environment() : 'production';
     }
 }

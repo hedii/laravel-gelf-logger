@@ -32,14 +32,12 @@ class GelfLoggerTest extends Orchestra
     /** @test */
     public function it_should_have_a_gelf_log_channel(): void
     {
-        /** @var \Illuminate\Log\Logger $handler */
         $logger = Log::channel('gelf');
 
         $this->assertInstanceOf(Logger::class, $logger->getLogger());
         $this->assertSame($logger->getName(), 'my-custom-name');
         $this->assertCount(1, $logger->getHandlers());
 
-        /** @var \Monolog\Handler\GelfHandler $handler */
         $handler = $logger->getHandlers()[0];
 
         $this->assertInstanceOf(GelfHandler::class, $handler);
@@ -47,5 +45,17 @@ class GelfLoggerTest extends Orchestra
         $this->assertInstanceOf(GelfMessageFormatter::class, $handler->getFormatter());
 
         // cannot test publisher and transport... :(
+    }
+
+    /** @test */
+    public function it_should_not_have_any_processor_if_the_config_does_not_have_processors(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('You tried to pop from an empty processor stack.');
+
+        $logger = Log::channel('gelf');
+        $handler = $logger->getHandlers()[0];
+
+        $handler->popProcessor();
     }
 }
