@@ -16,7 +16,7 @@ class GelfLoggerFactory
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Foundation\Application | \Laravel\Lumen\Application
      */
     protected $app;
 
