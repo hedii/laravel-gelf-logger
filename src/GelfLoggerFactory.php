@@ -14,7 +14,7 @@ use Monolog\Logger;
 class GelfLoggerFactory
 {
     /**
-     * The application instance.
+     * The container implementation.
      *
      * @var \Illuminate\Contracts\Container\Container
      */
