@@ -5,7 +5,7 @@ namespace Hedii\LaravelGelfLogger;
 use Gelf\Publisher;
 use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\UdpTransport;
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
