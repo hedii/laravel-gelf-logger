@@ -5,7 +5,7 @@ namespace Hedii\LaravelGelfLogger;
 use Gelf\Publisher;
 use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\UdpTransport;
-use Illuminate\Foundation\Application;
+use Illuminate\Container\Container;
 use InvalidArgumentException;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
@@ -39,9 +39,9 @@ class GelfLoggerFactory
     /**
      * GelfLoggerFactory constructor.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param \Illuminate\Foundation\Application | \Laravel\Lumen\Application $app
      */
-    public function __construct(Application $app)
+    public function __construct(Container $app)
     {
         $this->app = $app;
     }
