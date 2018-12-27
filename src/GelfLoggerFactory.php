@@ -16,7 +16,7 @@ class GelfLoggerFactory
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application | \Laravel\Lumen\Application
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $app;
 
@@ -39,7 +39,7 @@ class GelfLoggerFactory
     /**
      * GelfLoggerFactory constructor.
      *
-     * @param \Illuminate\Foundation\Application | \Laravel\Lumen\Application $app
+     * @param \Illuminate\Contracts\Container\Container $app
      */
     public function __construct(Container $app)
     {
