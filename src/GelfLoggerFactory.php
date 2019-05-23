@@ -63,7 +63,7 @@ class GelfLoggerFactory
 
         $handler = new GelfHandler(new Publisher($transport), $this->level($config));
 
-        $handler->setFormatter(new GelfMessageFormatter(null, null, null));
+        $handler->setFormatter(new GelfMessageFormatter($config['systemName'] ?? null, null, null));
 
         foreach ($this->parseProcessors($config) as $processor) {
             $handler->pushProcessor(new $processor);
