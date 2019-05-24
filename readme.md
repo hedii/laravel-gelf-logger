@@ -65,6 +65,11 @@ return [
             // configuration value
             'name' => 'my-custom-name',
 
+            // This optional option determines the system name sent with the
+            // message in the 'source' field. When Forgotten or set to null,
+            // the current hostname is used.
+            'system_name' => null,
+
             // This optional option determines the host that will receive the
             // gelf log messages. Default is 127.0.0.1
             'host' => '127.0.0.1',
