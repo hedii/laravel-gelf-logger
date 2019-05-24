@@ -58,4 +58,32 @@ class GelfLoggerTest extends Orchestra
 
         $handler->popProcessor();
     }
+
+    /** @test */
+    public function it_should_set_system_name_to_current_hostname_if_system_name_is_null(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'system_name' => null,
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class
+        ]);
+
+        $logger = Log::channel('gelf');
+
+        $this->assertAttributeEquals(gethostname(), 'systemName', $logger->getHandlers()[0]->getFormatter());
+    }
+
+    /** @test */
+    public function it_should_set_system_name_to_custom_value_if_system_name_config_is_provided(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'system_name' => 'my-system-name',
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class
+        ]);
+
+        $logger = Log::channel('gelf');
+
+        $this->assertAttributeEquals('my-system-name', 'systemName', $logger->getHandlers()[0]->getFormatter());
+    }
 }
