@@ -3,13 +3,14 @@
 namespace Hedii\LaravelGelfLogger;
 
 use Gelf\Publisher;
-use Gelf\Transport\IgnoreErrorTransportWrapper;
-use Gelf\Transport\UdpTransport;
-use Illuminate\Contracts\Container\Container;
-use InvalidArgumentException;
-use Monolog\Formatter\GelfMessageFormatter;
-use Monolog\Handler\GelfHandler;
 use Monolog\Logger;
+use InvalidArgumentException;
+use Gelf\Transport\TcpTransport;
+use Gelf\Transport\UdpTransport;
+use Monolog\Handler\GelfHandler;
+use Monolog\Formatter\GelfMessageFormatter;
+use Illuminate\Contracts\Container\Container;
+use Gelf\Transport\IgnoreErrorTransportWrapper;
 
 class GelfLoggerFactory
 {
@@ -54,10 +55,15 @@ class GelfLoggerFactory
      */
     public function __invoke(array $config): Logger
     {
+        $host = $config['host'] ?? '127.0.0.1';
+        $port = $config['port'] ?? 12201;
+        $transportType = $config['transport'] ?? 'udp';
+
         $transport = new IgnoreErrorTransportWrapper(
-            new UdpTransport(
-                $config['host'] ?? '127.0.0.1',
-                $config['port'] ?? 12201
+            $this->getTransport(
+                $transportType,
+                $host,
+                $port
             )
         );
 
@@ -70,6 +76,26 @@ class GelfLoggerFactory
         }
 
         return new Logger($this->parseChannel($config), [$handler]);
+    }
+
+    /**
+     * Get the transport class based on the
+     * config value.
+     *
+     * @param  string $transport
+     * @param  string $host
+     * @param  int $port
+     * @return \Gelf\Transport\UdpTransport|\Gelf\Transport\TcpTransport
+     */
+    protected function getTransport(string $transport, string $host, int $port)
+    {
+        switch ($transport) {
+            case 'tcp':
+                return new TcpTransport($host, $port);
+
+            case 'udp':
+                return new UdpTransport($host, $port);
+        }
     }
 
     /**

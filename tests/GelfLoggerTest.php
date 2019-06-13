@@ -2,11 +2,13 @@
 
 namespace Hedii\LaravelGelfLogger\Tests;
 
-use Hedii\LaravelGelfLogger\GelfLoggerFactory;
+use Monolog\Logger;
+use Gelf\Transport\TcpTransport;
+use Gelf\Transport\UdpTransport;
+use Monolog\Handler\GelfHandler;
 use Illuminate\Support\Facades\Log;
 use Monolog\Formatter\GelfMessageFormatter;
-use Monolog\Handler\GelfHandler;
-use Monolog\Logger;
+use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class GelfLoggerTest extends Orchestra
@@ -85,5 +87,36 @@ class GelfLoggerTest extends Orchestra
         $logger = Log::channel('gelf');
 
         $this->assertAttributeEquals('my-system-name', 'systemName', $logger->getHandlers()[0]->getFormatter());
+    }
+
+    /** @test */
+    public function it_should_call_the_tcp_transport_method_when_provided()
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'transport' => 'tcp',
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class
+        ]);
+
+        $logger = Log::channel('gelf');
+        $publisher = $this->getObjectAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getObjectAttribute($publisher->getTransports()[0], 'transport');
+
+        $this->assertInstanceOf(TcpTransport::class, $transport);
+    }
+
+    /** @test */
+    public function it_should_call_the_udp_transport_method_when_nothing_is_provided()
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class
+        ]);
+
+        $logger = Log::channel('gelf');
+        $publisher = $this->getObjectAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getObjectAttribute($publisher->getTransports()[0], 'transport');
+
+        $this->assertInstanceOf(UdpTransport::class, $transport);
     }
 }
