@@ -44,7 +44,7 @@ return [
             'driver' => 'custom',
 
             'via' => \Hedii\LaravelGelfLogger\GelfLoggerFactory::class,
-            
+
             // This optional option determines the processors that should be
             // pushed to the handler. This option is useful to modify a field
             // in the log context (see NullStringProcessor), or to add extra
@@ -77,6 +77,10 @@ return [
             // This optional option determines the port on which the gelf
             // receiver host is listening. Default is 12201
             'port' => 12201,
+
+            // This optional option determines if you want the TCP transport
+            // for the gelf log messages. Default is UDP
+            'transport' => 'udp'
         ],
     ],
 ];

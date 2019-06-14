@@ -2,14 +2,14 @@
 
 namespace Hedii\LaravelGelfLogger\Tests;
 
-use Monolog\Logger;
-use Gelf\Transport\TcpTransport;
-use Gelf\Transport\UdpTransport;
-use Monolog\Handler\GelfHandler;
+use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
 use Monolog\Formatter\GelfMessageFormatter;
-use Hedii\LaravelGelfLogger\GelfLoggerFactory;
+use Monolog\Handler\GelfHandler;
+use Monolog\Logger;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Gelf\Transport\TcpTransport;
+use Gelf\Transport\UdpTransport;
 
 class GelfLoggerTest extends Orchestra
 {
@@ -99,8 +99,8 @@ class GelfLoggerTest extends Orchestra
         ]);
 
         $logger = Log::channel('gelf');
-        $publisher = $this->getObjectAttribute($logger->getHandlers()[0], 'publisher');
-        $transport = $this->getObjectAttribute($publisher->getTransports()[0], 'transport');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
 
         $this->assertInstanceOf(TcpTransport::class, $transport);
     }
@@ -114,9 +114,30 @@ class GelfLoggerTest extends Orchestra
         ]);
 
         $logger = Log::channel('gelf');
-        $publisher = $this->getObjectAttribute($logger->getHandlers()[0], 'publisher');
-        $transport = $this->getObjectAttribute($publisher->getTransports()[0], 'transport');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
 
         $this->assertInstanceOf(UdpTransport::class, $transport);
+    }
+
+    /**
+     * Get protected or private attribute from an object.
+     * NOTICE: This method is for testing purposes only.
+     *
+     * @param object $object
+     * @param string $property
+     * @return mixed
+     * @throws Exception
+     */
+    protected function getAttribute($object, $property) {
+        try {
+            $reflector = new \ReflectionClass($object);
+            $attribute = $reflector->getProperty($property);
+            $attribute->setAccessible(true);
+
+            return $attribute->getValue($object);
+        } catch (Exception $e) {
+            throw new Exception("Can't get attribute from the provided object");
+        }
     }
 }
