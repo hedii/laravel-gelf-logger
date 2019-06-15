@@ -2,12 +2,17 @@
 
 namespace Hedii\LaravelGelfLogger\Tests;
 
+use Exception;
+use Gelf\Publisher;
 use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
 use Monolog\Logger;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Gelf\Transport\TcpTransport;
+use Gelf\Transport\UdpTransport;
+use ReflectionClass;
 
 class GelfLoggerTest extends Orchestra
 {
@@ -44,7 +49,11 @@ class GelfLoggerTest extends Orchestra
         $this->assertSame(Logger::NOTICE, $handler->getLevel());
         $this->assertInstanceOf(GelfMessageFormatter::class, $handler->getFormatter());
 
-        // cannot test publisher and transport... :(
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
+
+        $this->assertInstanceOf(Publisher::class, $publisher);
+        $this->assertInstanceOf(UdpTransport::class, $transport);
     }
 
     /** @test */
@@ -70,7 +79,10 @@ class GelfLoggerTest extends Orchestra
 
         $logger = Log::channel('gelf');
 
-        $this->assertAttributeEquals(gethostname(), 'systemName', $logger->getHandlers()[0]->getFormatter());
+        $this->assertSame(
+            gethostname(),
+            $this->getAttribute($logger->getHandlers()[0]->getFormatter(), 'systemName')
+        );
     }
 
     /** @test */
@@ -84,6 +96,62 @@ class GelfLoggerTest extends Orchestra
 
         $logger = Log::channel('gelf');
 
-        $this->assertAttributeEquals('my-system-name', 'systemName', $logger->getHandlers()[0]->getFormatter());
+        $this->assertSame(
+            'my-system-name',
+            $this->getAttribute($logger->getHandlers()[0]->getFormatter(), 'systemName')
+        );
+    }
+
+    /** @test */
+    public function it_should_call_the_tcp_transport_method_when_provided(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'transport' => 'tcp',
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class
+        ]);
+
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
+
+        $this->assertInstanceOf(TcpTransport::class, $transport);
+    }
+
+    /** @test */
+    public function it_should_call_the_udp_transport_method_when_nothing_is_provided(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class
+        ]);
+
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
+
+        $this->assertInstanceOf(UdpTransport::class, $transport);
+    }
+
+    /**
+     * Get protected or private attribute from an object.
+     * NOTICE: This method is for testing purposes only.
+     *
+     * @param object $object
+     * @param string $property
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getAttribute($object, string $property)
+    {
+        try {
+            $reflector = new ReflectionClass($object);
+            $attribute = $reflector->getProperty($property);
+            $attribute->setAccessible(true);
+
+            return $attribute->getValue($object);
+        } catch (Exception $e) {
+            throw new Exception("Can't get attribute from the provided object");
+        }
     }
 }

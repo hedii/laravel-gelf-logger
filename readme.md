@@ -6,7 +6,7 @@ A package to send [gelf](http://docs.graylog.org/en/2.1/pages/gelf.html) logs to
 
 It uses the new [Laravel custom log channel](https://laravel.com/docs/master/logging) introduced in Laravel 5.6.
 
-A gelf receiver like graylog2 must be configured to receive messages with a GELF UDP Input.
+A gelf receiver like graylog2 must be configured to receive messages with a GELF UDP or TCP Input.
 
 ## Table of contents
 
@@ -44,7 +44,7 @@ return [
             'driver' => 'custom',
 
             'via' => \Hedii\LaravelGelfLogger\GelfLoggerFactory::class,
-            
+
             // This optional option determines the processors that should be
             // pushed to the handler. This option is useful to modify a field
             // in the log context (see NullStringProcessor), or to add extra
@@ -69,6 +69,10 @@ return [
             // message in the 'source' field. When Forgotten or set to null,
             // the current hostname is used.
             'system_name' => null,
+
+            // This optional option determines if you want the TCP transport
+            // for the gelf log messages. Default is UDP
+            'transport' => 'udp'
 
             // This optional option determines the host that will receive the
             // gelf log messages. Default is 127.0.0.1
