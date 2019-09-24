@@ -72,7 +72,7 @@ return [
 
             // This optional option determines if you want the TCP transport
             // for the gelf log messages. Default is UDP
-            'transport' => 'udp'
+            'transport' => 'udp',
 
             // This optional option determines the host that will receive the
             // gelf log messages. Default is 127.0.0.1
