@@ -133,6 +133,56 @@ class GelfLoggerTest extends Orchestra
         $this->assertInstanceOf(UdpTransport::class, $transport);
     }
 
+    /** @test */
+    public function it_should_set_max_length_if_max_length_is_provided(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'max_length' => 9999
+        ]);
+
+        $logger = Log::channel('gelf');
+
+        $this->assertSame(
+            9999,
+            $this->getAttribute($logger->getHandlers()[0]->getFormatter(), 'maxLength')
+        );
+    }
+
+    /** @test */
+    public function it_should_use_default_max_length_when_max_length_is_not_provided(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class
+        ]);
+
+        $logger = Log::channel('gelf');
+
+        $this->assertSame(
+            GelfMessageFormatter::DEFAULT_MAX_LENGTH,
+            $this->getAttribute($logger->getHandlers()[0]->getFormatter(), 'maxLength')
+        );
+    }
+
+    /** @test */
+    public function it_should_use_default_max_length_when_max_length_is_null(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'max_length' => null
+        ]);
+
+        $logger = Log::channel('gelf');
+
+        $this->assertSame(
+            GelfMessageFormatter::DEFAULT_MAX_LENGTH,
+            $this->getAttribute($logger->getHandlers()[0]->getFormatter(), 'maxLength')
+        );
+    }
+
     /**
      * Get protected or private attribute from an object.
      * NOTICE: This method is for testing purposes only.

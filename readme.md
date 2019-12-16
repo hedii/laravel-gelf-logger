@@ -66,7 +66,7 @@ return [
             'name' => 'my-custom-name',
 
             // This optional option determines the system name sent with the
-            // message in the 'source' field. When Forgotten or set to null,
+            // message in the 'source' field. When forgotten or set to null,
             // the current hostname is used.
             'system_name' => null,
 
@@ -81,6 +81,12 @@ return [
             // This optional option determines the port on which the gelf
             // receiver host is listening. Default is 12201
             'port' => 12201,
+
+            // This optional option determines the maximum length per message
+            // field. When forgotten or set to null, the default value of 
+            // \Monolog\Formatter\GelfMessageFormatter::DEFAULT_MAX_LENGTH is
+            // used (currently this value is 32766)
+            'max_length' => null,
         ],
     ],
 ];
