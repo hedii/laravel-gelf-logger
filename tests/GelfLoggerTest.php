@@ -161,7 +161,7 @@ class GelfLoggerTest extends Orchestra
         $logger = Log::channel('gelf');
 
         $this->assertSame(
-            GelfMessageFormatter::DEFAULT_MAX_LENGTH,
+            $this->getConstant(GelfMessageFormatter::class, 'DEFAULT_MAX_LENGTH'),
             $this->getAttribute($logger->getHandlers()[0]->getFormatter(), 'maxLength')
         );
     }
@@ -178,21 +178,20 @@ class GelfLoggerTest extends Orchestra
         $logger = Log::channel('gelf');
 
         $this->assertSame(
-            GelfMessageFormatter::DEFAULT_MAX_LENGTH,
+            $this->getConstant(GelfMessageFormatter::class, 'DEFAULT_MAX_LENGTH'),
             $this->getAttribute($logger->getHandlers()[0]->getFormatter(), 'maxLength')
         );
     }
 
     /**
      * Get protected or private attribute from an object.
-     * NOTICE: This method is for testing purposes only.
      *
      * @param object $object
      * @param string $property
      * @return mixed
      * @throws \Exception
      */
-    protected function getAttribute($object, string $property)
+    protected function getAttribute(object $object, string $property)
     {
         try {
             $reflector = new ReflectionClass($object);
@@ -201,7 +200,26 @@ class GelfLoggerTest extends Orchestra
 
             return $attribute->getValue($object);
         } catch (Exception $e) {
-            throw new Exception("Can't get attribute from the provided object");
+            throw new Exception('Cannot get attribute from the provided object');
+        }
+    }
+
+    /**
+     * Get protected or private constant from a class.
+     *
+     * @param string $class
+     * @param string $constant
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getConstant(string $class, string $constant)
+    {
+        try {
+            $reflector = new ReflectionClass($class);
+
+            return $reflector->getConstant($constant);
+        } catch (Exception $e) {
+            throw new Exception('Cannot get attribute from the provided class');
         }
     }
 }
