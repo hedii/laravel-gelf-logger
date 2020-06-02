@@ -69,8 +69,8 @@ class GelfLoggerFactory
         $handler->setFormatter(
             new GelfMessageFormatter(
                 $config['system_name'] ?? null,
-                null,
-                '',
+                $config['extra_prefix'] ?? null,
+                $config['context_prefix'] ?? '',
                 $config['max_length'] ?? null
             )
         );
