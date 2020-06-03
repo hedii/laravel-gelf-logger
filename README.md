@@ -88,12 +88,12 @@ return [
             // used (currently this value is 32766)
             'max_length' => null,
 
-            // Prefix for 'context' fields from the Monolog record (optional)
-            // Default without prefix
+            // This optional option determines the prefix for 'context' fields
+            // from the Monolog record. Default is null (no context prefix)
             'context_prefix' => null,
 
-            // Prefix for 'extra' fields from the Monolog record (optional)
-            // Default without prefix
+            // This optional option determines the prefix for 'extra' fields
+            // from the Monolog record. Default is null (no extra prefix)
             'extra_prefix' => null,
         ],
     ],
