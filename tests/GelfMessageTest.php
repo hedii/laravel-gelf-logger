@@ -8,24 +8,18 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 class GelfMessageTest extends Orchestra
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function it_should_append_prefixes(): void
     {
-        $loggerConfig = [
+        $this->app['config']->set('logging.channels.gelf', [
             'system_name' => 'my-system-namex',
             'driver' => 'custom',
             'via' => GelfLoggerFactory::class,
             'context_prefix' => 'ctxt_',
             'extra_prefix' => 'extra_'
-        ];
+        ]);
 
-        $this->app['config']->set('logging.channels.gelf', $loggerConfig);
-
-        $logger = Log::channel('gelf');
-
-        $formattedMessage = $logger->getHandlers()[0]->getFormatter()->format([
+        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format([
             'datetime' => '1591097093.0',
             'message' => 'test',
             'level' => 100,
@@ -39,22 +33,16 @@ class GelfMessageTest extends Orchestra
         $this->assertArrayHasKey('ctxt_message', $formattedMessage->getAllAdditionals());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_should_not_append_prefixes(): void
     {
-        $loggerConfig = [
+        $this->app['config']->set('logging.channels.gelf', [
             'system_name' => 'my-system-namex',
             'driver' => 'custom',
             'via' => GelfLoggerFactory::class
-        ];
+        ]);
 
-        $this->app['config']->set('logging.channels.gelf', $loggerConfig);
-
-        $logger = Log::channel('gelf');
-
-        $formattedMessage = $logger->getHandlers()[0]->getFormatter()->format([
+        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format([
             'datetime' => '1591097093.0',
             'message' => 'test',
             'level' => 100,
@@ -66,24 +54,18 @@ class GelfMessageTest extends Orchestra
         $this->assertArrayHasKey('id', $formattedMessage->getAllAdditionals());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function null_config_variables_should_not_add_prefixes(): void
     {
-        $loggerConfig = [
+        $this->app['config']->set('logging.channels.gelf', [
             'system_name' => 'my-system-namex',
             'driver' => 'custom',
             'via' => GelfLoggerFactory::class,
             'context_prefix' => null,
             'extra_prefix' => null
-        ];
+        ]);
 
-        $this->app['config']->set('logging.channels.gelf', $loggerConfig);
-
-        $logger = Log::channel('gelf');
-
-        $formattedMessage = $logger->getHandlers()[0]->getFormatter()->format([
+        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format([
             'datetime' => '1591097093.0',
             'message' => 'test',
             'level' => 100,
