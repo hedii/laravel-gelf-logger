@@ -87,6 +87,14 @@ return [
             // \Monolog\Formatter\GelfMessageFormatter::DEFAULT_MAX_LENGTH is
             // used (currently this value is 32766)
             'max_length' => null,
+
+            // Prefix for 'context' fields from the Monolog record (optional)
+            // Default without prefix
+            'context_prefix' => null,
+
+            // Prefix for 'extra' fields from the Monolog record (optional)
+            // Default without prefix
+            'extra_prefix' => null,
         ],
     ],
 ];
