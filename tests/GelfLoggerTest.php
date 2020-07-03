@@ -4,6 +4,7 @@ namespace Hedii\LaravelGelfLogger\Tests;
 
 use Exception;
 use Gelf\Publisher;
+use Gelf\Transport\HttpTransport;
 use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
 use Monolog\Formatter\GelfMessageFormatter;
@@ -181,6 +182,75 @@ class GelfLoggerTest extends Orchestra
             $this->getConstant(GelfMessageFormatter::class, 'DEFAULT_MAX_LENGTH'),
             $this->getAttribute($logger->getHandlers()[0]->getFormatter(), 'maxLength')
         );
+    }
+
+    /** @test */
+    public function it_should_call_the_http_transport_method_when_provided(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http'
+        ]);
+
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
+
+        $this->assertInstanceOf(HttpTransport::class, $transport);
+    }
+
+    /** @test */
+    public function it_should_set_path_if_path_is_provided(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http',
+            'path' => '/custom-path'
+        ]);
+
+        $logger = Log::channel('gelf');
+
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
+
+        $this->assertSame('/custom-path', $this->getAttribute($transport, 'path'));
+    }
+
+    /** @test */
+    public function it_should_set_path_to_default_path_if_path_is_null(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http',
+            'path' => null
+        ]);
+
+        $logger = Log::channel('gelf');
+
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
+
+        $this->assertSame(HttpTransport::DEFAULT_PATH, $this->getAttribute($transport, 'path'));
+    }
+
+    /** @test */
+    public function it_should_set_path_to_default_path_if_path_is_not_provided(): void
+    {
+        $this->app['config']->set('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http'
+        ]);
+
+        $logger = Log::channel('gelf');
+
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
+
+        $this->assertSame(HttpTransport::DEFAULT_PATH, $this->getAttribute($transport, 'path'));
     }
 
     /**
