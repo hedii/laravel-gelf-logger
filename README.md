@@ -53,7 +53,7 @@ return [
             // Default is an empty array.
             'processors' => [
                 \Hedii\LaravelGelfLogger\Processors\NullStringProcessor::class,
-                \Foo\Bar\AnotherProcessor::class,
+                // another processor...
             ],
 
             // This optional option determines the minimum "level" a message
