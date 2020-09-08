@@ -27,7 +27,7 @@
     },
     "require": {
         "php": "^7.2.5",
-        "illuminate/log": "^7.0",
+        "illuminate/log": "^7.0|^8.0",
         "graylog2/gelf-php": "^1.6"
     },
     "require-dev": {
