@@ -26,7 +26,7 @@
         "source": "https://github.com/hedii/laravel-gelf-logger"
     },
     "require": {
-        "php": "^7.2.5",
+        "php": "^7.2.5|^8.0",
         "illuminate/log": "^7.0|^8.0",
         "graylog2/gelf-php": "^1.6"
     },
