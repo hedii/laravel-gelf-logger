@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/hedii/laravel-gelf-logger.svg?branch=master)](https://travis-ci.org/hedii/laravel-gelf-logger)
+![Build Status](https://github.com/hedii/laravel-gelf-logger/workflows/build/badge.svg)
 
 # Laravel Gelf Logger
 
