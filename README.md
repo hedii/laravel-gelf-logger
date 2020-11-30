@@ -1,4 +1,4 @@
-![Build Status](https://github.com/hedii/laravel-gelf-logger/workflows/build/badge.svg)
+![Build Status](https://github.com/hedii/laravel-gelf-logger/workflows/Tests/badge.svg)
 
 # Laravel Gelf Logger
 
