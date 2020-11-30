@@ -7,17 +7,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['7.2', '7.3', '7.4', '8.0']
+        php-versions: ['7.3', '7.4', '8.0']
     name: Testing on PHP ${{ matrix.php-versions }}
     steps:
-      - uses: actions/checkout@v2
-      - name: setup
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: mbstring,bcmath
           tools: phpunit,composer
-      - name: install deps
-        run: composer install -o -q
-      - name: run tests
+      - name: Install dependencies
+        run: composer install --quiet --no-ansi --no-interaction --no-scripts --no-progress
+      - name: Run tests
         run: composer test
