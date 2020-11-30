@@ -1,13 +1,11 @@
-name: build
-
-on: [push]
-
+name: Tests
+on: [ push, pull_request ]
 jobs:
   run:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['7.3', '7.4', '8.0']
+        php-versions: [ '7.3', '7.4', '8.0' ]
     name: Testing on PHP ${{ matrix.php-versions }}
     steps:
       - name: Checkout
