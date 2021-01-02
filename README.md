@@ -1,6 +1,18 @@
-[![Build Status](https://github.com/hedii/laravel-gelf-logger/workflows/Tests/badge.svg)](https://github.com/hedii/laravel-gelf-logger/actions)
-
 # Laravel Gelf Logger
+
+[![Build Status](https://github.com/hedii/laravel-gelf-logger/workflows/Tests/badge.svg)](https://github.com/hedii/laravel-gelf-logger/actions)
+[![Total Downloads](https://poser.pugx.org/hedii/laravel-gelf-logger/downloads)](//packagist.org/packages/hedii/laravel-gelf-logger)
+[![License](https://poser.pugx.org/hedii/laravel-gelf-logger/license)](//packagist.org/packages/hedii/laravel-gelf-logger)
+[![Latest Stable Version](https://poser.pugx.org/hedii/laravel-gelf-logger/v)](//packagist.org/packages/hedii/laravel-gelf-logger)
+
+| **Laravel**  |  **laravel-gelf-logger** |
+|---|---|
+| 5.6  | ^3.0  |
+| 5.8  | ^3.1  |
+| 6.0  | ^4.0  |
+| 7.0  | ^5.0  |
+| 8.0  | ^5.3 |
+| 8.0  | ^6.0 (with php 8) |
 
 A package to send [gelf](http://docs.graylog.org/en/2.1/pages/gelf.html) logs to a gelf compatible backend like graylog. It is a Laravel wrapper for [bzikarsky/gelf-php](https://github.com/bzikarsky/gelf-php) package.
 
@@ -42,6 +54,7 @@ return [
 
         'gelf' => [
             'driver' => 'custom',
+            
 
             'via' => \Hedii\LaravelGelfLogger\GelfLoggerFactory::class,
 
