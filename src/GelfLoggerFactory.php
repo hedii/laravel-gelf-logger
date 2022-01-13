@@ -16,18 +16,8 @@ use Monolog\Logger;
 
 class GelfLoggerFactory
 {
-    /**
-     * The container implementation.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
     protected $app;
 
-    /**
-     * The Log levels.
-     *
-     * @var array
-     */
     protected $levels = [
         'debug' => Logger::DEBUG,
         'info' => Logger::INFO,
@@ -39,22 +29,11 @@ class GelfLoggerFactory
         'emergency' => Logger::EMERGENCY,
     ];
 
-    /**
-     * GelfLoggerFactory constructor.
-     *
-     * @param \Illuminate\Contracts\Container\Container $app
-     */
     public function __construct(Container $app)
     {
         $this->app = $app;
     }
 
-    /**
-     * Create a custom Monolog instance.
-     *
-     * @param array $config
-     * @return \Monolog\Logger
-     */
     public function __invoke(array $config): Logger
     {
         $transport = new IgnoreErrorTransportWrapper(
@@ -84,37 +63,23 @@ class GelfLoggerFactory
         return new Logger($this->parseChannel($config), [$handler]);
     }
 
-    /**
-     * Get the transport class based on the
-     * config value.
-     *
-     * @param string $transport
-     * @param string $host
-     * @param int $port
-     * @param string|null $path
-     * @return \Gelf\Transport\AbstractTransport
-     */
-    protected function getTransport(string $transport, string $host, int $port, ?string $path = null): AbstractTransport
-    {
+    protected function getTransport(
+        string $transport,
+        string $host,
+        int $port,
+        ?string $path = null
+    ): AbstractTransport {
         switch (strtolower($transport)) {
             case 'tcp':
                 return new TcpTransport($host, $port);
-
             case 'http':
                 return new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH);
-
             default:
                 return new UdpTransport($host, $port);
         }
     }
 
-    /**
-     * Parse the string level into a Monolog constant.
-     *
-     * @param array $config
-     * @return int
-     * @throws \InvalidArgumentException
-     */
+    /** @throws \InvalidArgumentException */
     protected function level(array $config): int
     {
         $level = $config['level'] ?? 'debug';
@@ -126,12 +91,6 @@ class GelfLoggerFactory
         throw new InvalidArgumentException('Invalid log level.');
     }
 
-    /**
-     * Extract the processors from the given configuration.
-     *
-     * @param array $config
-     * @return array
-     */
     protected function parseProcessors(array $config): array
     {
         $processors = [];
@@ -145,12 +104,6 @@ class GelfLoggerFactory
         return $processors;
     }
 
-    /**
-     * Extract the log channel from the given configuration.
-     *
-     * @param array $config
-     * @return string
-     */
     protected function parseChannel(array $config): string
     {
         if (! isset($config['name'])) {
@@ -160,11 +113,6 @@ class GelfLoggerFactory
         return $config['name'];
     }
 
-    /**
-     * Get fallback log channel name.
-     *
-     * @return string
-     */
     protected function getFallbackChannelName(): string
     {
         return $this->app->bound('env') ? $this->app->environment() : 'production';

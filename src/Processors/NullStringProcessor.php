@@ -6,9 +6,6 @@ class NullStringProcessor
 {
     /**
      * Transform a "NULL" string record into a null value.
-     *
-     * @param array $record
-     * @return array
      */
     public function __invoke(array $record): array
     {
