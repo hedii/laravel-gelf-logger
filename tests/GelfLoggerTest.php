@@ -256,8 +256,6 @@ class GelfLoggerTest extends Orchestra
     /**
      * Get protected or private attribute from an object.
      *
-     * @param object $object
-     * @param string $property
      * @return mixed
      * @throws \Exception
      */
@@ -277,8 +275,6 @@ class GelfLoggerTest extends Orchestra
     /**
      * Get protected or private constant from a class.
      *
-     * @param string $class
-     * @param string $constant
      * @return mixed
      * @throws \Exception
      */
