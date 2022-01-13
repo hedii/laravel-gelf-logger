@@ -66,6 +66,7 @@ return [
             // Default is an empty array.
             'processors' => [
                 \Hedii\LaravelGelfLogger\Processors\NullStringProcessor::class,
+                \Hedii\LaravelGelfLogger\Processors\RenameIdFieldProcessor::class,
                 // another processor...
             ],
 
