@@ -6,6 +6,7 @@ use Gelf\Publisher;
 use Gelf\Transport\AbstractTransport;
 use Gelf\Transport\HttpTransport;
 use Gelf\Transport\IgnoreErrorTransportWrapper;
+use Gelf\Transport\SslOptions;
 use Gelf\Transport\UdpTransport;
 use Gelf\Transport\TcpTransport;
 use Illuminate\Contracts\Container\Container;
@@ -41,7 +42,8 @@ class GelfLoggerFactory
                 $config['transport'] ?? 'udp',
                 $config['host'] ?? '127.0.0.1',
                 $config['port'] ?? 12201,
-                $config['path'] ?? null
+                $config['path'] ?? null,
+	  	$config['ssl'] ?? null
             )
         );
 
@@ -67,12 +69,13 @@ class GelfLoggerFactory
         string $transport,
         string $host,
         int $port,
-        ?string $path = null
+        ?string $path = null,
+		?array $ssl = null
     ): AbstractTransport {
         switch (strtolower($transport)) {
             case 'tcp':
-                return new TcpTransport($host, $port);
-            case 'http':
+                return new TcpTransport($host, $port, $this->createSsl($ssl));
+			case 'http':
                 return new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH);
             default:
                 return new UdpTransport($host, $port);
@@ -117,4 +120,19 @@ class GelfLoggerFactory
     {
         return $this->app->bound('env') ? $this->app->environment() : 'production';
     }
+
+	private function createSsl(?array $ssl): ?SslOptions
+	{
+		if (empty($ssl)) {
+			return null;
+		}
+
+		$sslOptions = new SslOptions();
+		$sslOptions->setAllowSelfSigned((bool) $ssl['allow_self_signed'] ?? false);
+		$sslOptions->setCaFile($ssl['ca_file'] ?? null);
+		$sslOptions->setCiphers($ssl['ciphers'] ?? null);
+		$sslOptions->setVerifyPeer((bool) $ssl['verify_peer'] ?? true);
+
+		return $sslOptions;
+	}
 }

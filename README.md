@@ -54,7 +54,6 @@ return [
 
         'gelf' => [
             'driver' => 'custom',
-            
 
             'via' => \Hedii\LaravelGelfLogger\GelfLoggerFactory::class,
 
@@ -114,6 +113,17 @@ return [
             // This optional option determines the prefix for 'extra' fields
             // from the Monolog record. Default is null (no extra prefix)
             'extra_prefix' => null,
+
+            // Optional option to set ssl on tcp requests. On udp requests this is ignored
+            // This configuration will be added the specified port in this configuration item.
+            // The base package of graylog is only setting ssl on port 12202.
+            // When you just want base settings of graylog2/gelf-php then you don't specify this attribute.
+            'ssl' => [
+                'verify_peer' => true,
+                'ca_file' => '/path/to/ca.pem',  // or null
+                'ciphers' => 'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256', // or null
+                'allow_self_signed' => false,
+            ]
         ],
     ],
 ];
