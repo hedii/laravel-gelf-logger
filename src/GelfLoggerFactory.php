@@ -128,10 +128,10 @@ class GelfLoggerFactory
 		}
 
 		$sslOptions = new SslOptions();
-		$sslOptions->setAllowSelfSigned((bool) $ssl['allow_self_signed'] ?? false);
+		$sslOptions->setAllowSelfSigned($ssl['allow_self_signed'] ?? false);
 		$sslOptions->setCaFile($ssl['ca_file'] ?? null);
 		$sslOptions->setCiphers($ssl['ciphers'] ?? null);
-		$sslOptions->setVerifyPeer((bool) $ssl['verify_peer'] ?? true);
+		$sslOptions->setVerifyPeer($ssl['verify_peer'] ?? true);
 
 		return $sslOptions;
 	}
