@@ -255,12 +255,13 @@ class GelfLoggerTest extends Orchestra
     }
 
 	/** @test */
-	public function it_should_set_the_ssl_options_for_tcp_connections()
+	public function it_should_set_the_ssl_options_and_overrule_base_package_for_tcp_connections()
 	{
 		$this->app['config']->set('logging.channels.gelf', [
 			'driver' => 'custom',
 			'via' => GelfLoggerFactory::class,
 			'transport' => 'tcp',
+			'port' => 12202,
 			'ssl' => [
 				'verify_peer' => false,
 				'ca_file' => '/path/to/ca.pem',
@@ -282,6 +283,7 @@ class GelfLoggerTest extends Orchestra
 		$this->assertEquals('TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256', $sslOptions->getCiphers());
 	}
 
+
 	/** @test */
 	public function it_should_not_add_ssl_on_tcp_when_the_ssl_config_is_missing()
 	{
@@ -296,6 +298,29 @@ class GelfLoggerTest extends Orchestra
 		$transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
 
 		$this->assertNull($this->getAttribute($transport, 'sslOptions'));
+	}
+
+	/** @test */
+	public function it_should_uses_the_default_ssl_options_on_ssl_port_without_specifying_ours()
+	{
+		$this->app['config']->set('logging.channels.gelf', [
+			'driver' => 'custom',
+			'via' => GelfLoggerFactory::class,
+			'transport' => 'tcp',
+			'port' => 12202,
+		]);
+
+		$logger = Log::channel('gelf');
+		$publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+		$transport = $this->getAttribute($publisher->getTransports()[0], 'transport');
+
+		/** @var SslOptions $sslOptions */
+		$sslOptions = $this->getAttribute($transport, 'sslOptions');
+
+		$this->assertTrue($sslOptions->getVerifyPeer());
+		$this->assertFalse($sslOptions->getAllowSelfSigned());
+		$this->assertNull($sslOptions->getCaFile());
+		$this->assertNull($sslOptions->getCiphers());
 	}
 
     /**
