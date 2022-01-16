@@ -99,6 +99,30 @@ return [
             // transport. When forgotten or set to null, default path '/gelf'
             // is used.
             'path' => null,
+            
+            // This optional option enable or disable ssl on TCP transport.
+            // Default is false.
+            'ssl' => false,
+            
+            // If ssl is enabled on TCP transport, the following configuration
+            // is used.
+            'ssl_options' => [
+                // Enable or disable the peer certificate check. Default is
+                // null.
+                'verify_peer' => true,
+                
+                // Path to a custom CA file (eg: "/path/to/ca.pem"). Default
+                // is null.
+                'ca_file' => null,
+                
+                // List of ciphers the SSL layer may use, formatted as
+                // specified in ciphers(1). Default is null.
+                'ciphers' => null,
+                
+                // Whether self-signed certificates are allowed. Default is
+                // false.
+                'allow_self_signed' => false,
+            ],
 
             // This optional option determines the maximum length per message
             // field. When forgotten or set to null, the default value of 
@@ -114,16 +138,6 @@ return [
             // from the Monolog record. Default is null (no extra prefix)
             'extra_prefix' => null,
 
-            // Optional option to set ssl on tcp requests. On udp requests this is ignored
-            // This configuration will be added the specified port in this configuration item.
-            // The base package of graylog is only setting ssl on port 12202.
-            // When you just want base settings of graylog2/gelf-php then you don't specify this attribute.
-            'ssl' => [
-                'verify_peer' => true,
-                'ca_file' => '/path/to/ca.pem',  // or null
-                'ciphers' => 'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256', // or null
-                'allow_self_signed' => false,
-            ]
         ],
     ],
 ];

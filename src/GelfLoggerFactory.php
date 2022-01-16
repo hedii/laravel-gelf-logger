@@ -43,7 +43,7 @@ class GelfLoggerFactory
                 $config['host'] ?? '127.0.0.1',
                 $config['port'] ?? 12201,
                 $config['path'] ?? null,
-	  	$config['ssl'] ?? null
+                $this->enableSsl($config) ? $this->sslOptions($config['ssl_options'] ?? null) : null
             )
         );
 
@@ -70,16 +70,41 @@ class GelfLoggerFactory
         string $host,
         int $port,
         ?string $path = null,
-		?array $ssl = null
+        ?SslOptions $sslOptions = null
     ): AbstractTransport {
         switch (strtolower($transport)) {
             case 'tcp':
-                return new TcpTransport($host, $port, $this->createSsl($ssl));
-			case 'http':
-                return new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH);
+                return new TcpTransport($host, $port, $sslOptions);
+            case 'http':
+                return new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH, $sslOptions);
             default:
                 return new UdpTransport($host, $port);
         }
+    }
+
+    protected function enableSsl(array $config): bool
+    {
+        if (! isset($config['transport']) || $config['transport'] === 'udp') {
+            return false;
+        }
+
+        return $config['ssl'] ?? false;
+    }
+
+    protected function sslOptions(?array $sslConfig = null): SslOptions
+    {
+        $sslOptions = new SslOptions();
+
+        if (! $sslConfig) {
+            return $sslOptions;
+        }
+
+        $sslOptions->setVerifyPeer($sslConfig['verify_peer'] ?? true);
+        $sslOptions->setCaFile($sslConfig['ca_file'] ?? null);
+        $sslOptions->setCiphers($sslConfig['ciphers'] ?? null);
+        $sslOptions->setAllowSelfSigned($sslConfig['allow_self_signed'] ?? false);
+
+        return $sslOptions;
     }
 
     /** @throws \InvalidArgumentException */
@@ -120,19 +145,4 @@ class GelfLoggerFactory
     {
         return $this->app->bound('env') ? $this->app->environment() : 'production';
     }
-
-	private function createSsl(?array $ssl): ?SslOptions
-	{
-		if (empty($ssl)) {
-			return null;
-		}
-
-		$sslOptions = new SslOptions();
-		$sslOptions->setAllowSelfSigned($ssl['allow_self_signed'] ?? false);
-		$sslOptions->setCaFile($ssl['ca_file'] ?? null);
-		$sslOptions->setCiphers($ssl['ciphers'] ?? null);
-		$sslOptions->setVerifyPeer($ssl['verify_peer'] ?? true);
-
-		return $sslOptions;
-	}
 }
