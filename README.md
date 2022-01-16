@@ -54,7 +54,6 @@ return [
 
         'gelf' => [
             'driver' => 'custom',
-            
 
             'via' => \Hedii\LaravelGelfLogger\GelfLoggerFactory::class,
 
@@ -100,6 +99,30 @@ return [
             // transport. When forgotten or set to null, default path '/gelf'
             // is used.
             'path' => null,
+            
+            // This optional option enable or disable ssl on TCP transport.
+            // Default is false.
+            'ssl' => false,
+            
+            // If ssl is enabled on TCP transport, the following configuration
+            // is used.
+            'ssl_options' => [
+                // Enable or disable the peer certificate check. Default is
+                // null.
+                'verify_peer' => true,
+                
+                // Path to a custom CA file (eg: "/path/to/ca.pem"). Default
+                // is null.
+                'ca_file' => null,
+                
+                // List of ciphers the SSL layer may use, formatted as
+                // specified in ciphers(1). Default is null.
+                'ciphers' => null,
+                
+                // Whether self-signed certificates are allowed. Default is
+                // false.
+                'allow_self_signed' => false,
+            ],
 
             // This optional option determines the maximum length per message
             // field. When forgotten or set to null, the default value of 
@@ -114,6 +137,7 @@ return [
             // This optional option determines the prefix for 'extra' fields
             // from the Monolog record. Default is null (no extra prefix)
             'extra_prefix' => null,
+
         ],
     ],
 ];

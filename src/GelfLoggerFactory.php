@@ -6,6 +6,7 @@ use Gelf\Publisher;
 use Gelf\Transport\AbstractTransport;
 use Gelf\Transport\HttpTransport;
 use Gelf\Transport\IgnoreErrorTransportWrapper;
+use Gelf\Transport\SslOptions;
 use Gelf\Transport\UdpTransport;
 use Gelf\Transport\TcpTransport;
 use Illuminate\Contracts\Container\Container;
@@ -41,7 +42,8 @@ class GelfLoggerFactory
                 $config['transport'] ?? 'udp',
                 $config['host'] ?? '127.0.0.1',
                 $config['port'] ?? 12201,
-                $config['path'] ?? null
+                $config['path'] ?? null,
+                $this->enableSsl($config) ? $this->sslOptions($config['ssl_options'] ?? null) : null
             )
         );
 
@@ -67,16 +69,42 @@ class GelfLoggerFactory
         string $transport,
         string $host,
         int $port,
-        ?string $path = null
+        ?string $path = null,
+        ?SslOptions $sslOptions = null
     ): AbstractTransport {
         switch (strtolower($transport)) {
             case 'tcp':
-                return new TcpTransport($host, $port);
+                return new TcpTransport($host, $port, $sslOptions);
             case 'http':
-                return new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH);
+                return new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH, $sslOptions);
             default:
                 return new UdpTransport($host, $port);
         }
+    }
+
+    protected function enableSsl(array $config): bool
+    {
+        if (! isset($config['transport']) || $config['transport'] === 'udp') {
+            return false;
+        }
+
+        return $config['ssl'] ?? false;
+    }
+
+    protected function sslOptions(?array $sslConfig = null): SslOptions
+    {
+        $sslOptions = new SslOptions();
+
+        if (! $sslConfig) {
+            return $sslOptions;
+        }
+
+        $sslOptions->setVerifyPeer($sslConfig['verify_peer'] ?? true);
+        $sslOptions->setCaFile($sslConfig['ca_file'] ?? null);
+        $sslOptions->setCiphers($sslConfig['ciphers'] ?? null);
+        $sslOptions->setAllowSelfSigned($sslConfig['allow_self_signed'] ?? false);
+
+        return $sslOptions;
     }
 
     /** @throws \InvalidArgumentException */
