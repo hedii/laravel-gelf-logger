@@ -4,16 +4,16 @@ namespace Hedii\LaravelGelfLogger\Tests;
 
 use Exception;
 use Gelf\Publisher;
-use Gelf\Transport\SslOptions;
 use Gelf\Transport\HttpTransport;
+use Gelf\Transport\SslOptions;
+use Gelf\Transport\TcpTransport;
+use Gelf\Transport\UdpTransport;
 use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
 use Monolog\Logger;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Gelf\Transport\TcpTransport;
-use Gelf\Transport\UdpTransport;
 use ReflectionClass;
 
 class GelfLoggerTest extends Orchestra
