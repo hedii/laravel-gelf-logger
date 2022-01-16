@@ -100,12 +100,11 @@ return [
             // is used.
             'path' => null,
             
-            // This optional option enable or disable ssl on TCP transport.
-            // Default is false.
+            // This optional option enable or disable ssl on TCP or HTTP
+            // transports. Default is false.
             'ssl' => false,
             
-            // If ssl is enabled on TCP transport, the following configuration
-            // is used.
+            // If ssl is enabled, the following configuration is used.
             'ssl_options' => [
                 // Enable or disable the peer certificate check. Default is
                 // true.
