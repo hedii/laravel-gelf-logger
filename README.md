@@ -108,7 +108,7 @@ return [
             // is used.
             'ssl_options' => [
                 // Enable or disable the peer certificate check. Default is
-                // null.
+                // true.
                 'verify_peer' => true,
                 
                 // Path to a custom CA file (eg: "/path/to/ca.pem"). Default
