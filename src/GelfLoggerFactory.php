@@ -72,14 +72,11 @@ class GelfLoggerFactory
         ?string $path = null,
         ?SslOptions $sslOptions = null
     ): AbstractTransport {
-        switch (strtolower($transport)) {
-            case 'tcp':
-                return new TcpTransport($host, $port, $sslOptions);
-            case 'http':
-                return new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH, $sslOptions);
-            default:
-                return new UdpTransport($host, $port);
-        }
+        return match(strtolower($transport)) {
+            'tcp' => new TcpTransport($host, $port, $sslOptions),
+            'http' => new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH, $sslOptions),
+            default => new UdpTransport($host, $port),
+        };
     }
 
     protected function enableSsl(array $config): bool
