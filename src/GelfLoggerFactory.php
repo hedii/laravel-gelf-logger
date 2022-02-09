@@ -72,7 +72,7 @@ class GelfLoggerFactory
         ?string $path = null,
         ?SslOptions $sslOptions = null
     ): AbstractTransport {
-        return match (strtolower($transport)) {
+        return match(strtolower($transport)) {
             'tcp' => new TcpTransport($host, $port, $sslOptions),
             'http' => new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH, $sslOptions),
             default => new UdpTransport($host, $port),
