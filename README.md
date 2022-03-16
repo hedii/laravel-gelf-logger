@@ -137,6 +137,10 @@ return [
             // This optional option determines the prefix for 'extra' fields
             // from the Monolog record. Default is null (no extra prefix)
             'extra_prefix' => null,
+            
+            // This optional option determines whether errors thrown during
+            // logging should be ignored or not. Default is true.
+            'ignore_error' => true,
 
         ],
     ],

@@ -16,7 +16,7 @@ class GelfMessageTest extends Orchestra
             'driver' => 'custom',
             'via' => GelfLoggerFactory::class,
             'context_prefix' => 'ctxt_',
-            'extra_prefix' => 'extra_'
+            'extra_prefix' => 'extra_',
         ]);
 
         $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format([
@@ -24,7 +24,7 @@ class GelfMessageTest extends Orchestra
             'message' => 'test',
             'level' => 100,
             'extra' => ['ip' => '127.0.0.1', 'source' => 'tests'],
-            'context' => ['id' => '777', 'message' => 'custom']
+            'context' => ['id' => '777', 'message' => 'custom'],
         ]);
 
         $this->assertArrayHasKey('extra_ip', $formattedMessage->getAllAdditionals());
@@ -39,7 +39,7 @@ class GelfMessageTest extends Orchestra
         $this->app['config']->set('logging.channels.gelf', [
             'system_name' => 'my-system-namex',
             'driver' => 'custom',
-            'via' => GelfLoggerFactory::class
+            'via' => GelfLoggerFactory::class,
         ]);
 
         $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format([
@@ -47,7 +47,7 @@ class GelfMessageTest extends Orchestra
             'message' => 'test',
             'level' => 100,
             'extra' => ['ip' => '127.0.0.1'],
-            'context' => ['id' => '777']
+            'context' => ['id' => '777'],
         ]);
 
         $this->assertArrayHasKey('ip', $formattedMessage->getAllAdditionals());
@@ -62,7 +62,7 @@ class GelfMessageTest extends Orchestra
             'driver' => 'custom',
             'via' => GelfLoggerFactory::class,
             'context_prefix' => null,
-            'extra_prefix' => null
+            'extra_prefix' => null,
         ]);
 
         $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format([
@@ -70,7 +70,7 @@ class GelfMessageTest extends Orchestra
             'message' => 'test',
             'level' => 100,
             'extra' => ['ip' => '127.0.0.1'],
-            'context' => ['id' => '777']
+            'context' => ['id' => '777'],
         ]);
 
         $this->assertArrayHasKey('ip', $formattedMessage->getAllAdditionals());

@@ -11,7 +11,7 @@ class RenameIdFieldProcessorTest extends TestCase
     public function it_should_rename_id_field(): void
     {
         $payload = [
-            'context' => ['id' => 'bar']
+            'context' => ['id' => 'bar'],
         ];
 
         $processor = new RenameIdFieldProcessor();

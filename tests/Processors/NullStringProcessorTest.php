@@ -15,8 +15,8 @@ class NullStringProcessorTest extends TestCase
                 'key1' => 'bar',
                 'key2' => 'NULL',
                 'key3' => 'null',
-                'key4' => null
-            ]
+                'key4' => null,
+            ],
         ];
 
         $processor = new NullStringProcessor();
@@ -26,8 +26,8 @@ class NullStringProcessorTest extends TestCase
                 'key1' => 'bar',
                 'key2' => null,
                 'key3' => null,
-                'key4' => null
-            ]
+                'key4' => null,
+            ],
         ], $processor($payload));
     }
 }

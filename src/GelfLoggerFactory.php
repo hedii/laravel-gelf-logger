@@ -10,42 +10,34 @@ use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\UdpTransport;
 use Illuminate\Contracts\Container\Container;
-use InvalidArgumentException;
+use Illuminate\Log\ParsesLogConfiguration;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
 use Monolog\Logger;
 
 class GelfLoggerFactory
 {
-    protected $app;
+    use ParsesLogConfiguration;
 
-    protected $levels = [
-        'debug' => Logger::DEBUG,
-        'info' => Logger::INFO,
-        'notice' => Logger::NOTICE,
-        'warning' => Logger::WARNING,
-        'error' => Logger::ERROR,
-        'critical' => Logger::CRITICAL,
-        'alert' => Logger::ALERT,
-        'emergency' => Logger::EMERGENCY,
-    ];
-
-    public function __construct(Container $app)
+    public function __construct(protected Container $app)
     {
-        $this->app = $app;
     }
 
     public function __invoke(array $config): Logger
     {
-        $transport = new IgnoreErrorTransportWrapper(
-            $this->getTransport(
-                $config['transport'] ?? 'udp',
-                $config['host'] ?? '127.0.0.1',
-                $config['port'] ?? 12201,
-                $config['path'] ?? null,
-                $this->enableSsl($config) ? $this->sslOptions($config['ssl_options'] ?? null) : null
-            )
+        $ignoreError = $config['ignore_error'] ?? true;
+
+        $transport = $this->getTransport(
+            $config['transport'] ?? 'udp',
+            $config['host'] ?? '127.0.0.1',
+            $config['port'] ?? 12201,
+            $config['path'] ?? null,
+            $this->enableSsl($config) ? $this->sslOptions($config['ssl_options'] ?? null) : null
         );
+
+        if ($ignoreError) {
+            $transport = new IgnoreErrorTransportWrapper($transport);
+        }
 
         $handler = new GelfHandler(new Publisher($transport), $this->level($config));
 
@@ -72,7 +64,7 @@ class GelfLoggerFactory
         ?string $path = null,
         ?SslOptions $sslOptions = null
     ): AbstractTransport {
-        return match(strtolower($transport)) {
+        return match (strtolower($transport)) {
             'tcp' => new TcpTransport($host, $port, $sslOptions),
             'http' => new HttpTransport($host, $port, $path ?? HttpTransport::DEFAULT_PATH, $sslOptions),
             default => new UdpTransport($host, $port),
@@ -104,18 +96,6 @@ class GelfLoggerFactory
         return $sslOptions;
     }
 
-    /** @throws \InvalidArgumentException */
-    protected function level(array $config): int
-    {
-        $level = $config['level'] ?? 'debug';
-
-        if (isset($this->levels[$level])) {
-            return $this->levels[$level];
-        }
-
-        throw new InvalidArgumentException('Invalid log level.');
-    }
-
     protected function parseProcessors(array $config): array
     {
         $processors = [];
@@ -127,15 +107,6 @@ class GelfLoggerFactory
         }
 
         return $processors;
-    }
-
-    protected function parseChannel(array $config): string
-    {
-        if (! isset($config['name'])) {
-            return $this->getFallbackChannelName();
-        }
-
-        return $config['name'];
     }
 
     protected function getFallbackChannelName(): string

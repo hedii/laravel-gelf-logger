@@ -27,8 +27,8 @@
     },
     "require": {
         "php": "^8.0",
-        "illuminate/log": "^9.0",
-        "graylog2/gelf-php": "^1.7"
+        "graylog2/gelf-php": "^1.7",
+        "illuminate/log": "^9.0"
     },
     "require-dev": {
         "orchestra/testbench": "^7.0"
@@ -42,6 +42,9 @@
         "psr-4": {
             "Hedii\\LaravelGelfLogger\\Tests\\": "tests/"
         }
+    },
+    "config": {
+        "sort-packages": true
     },
     "scripts": {
         "test": "vendor/bin/phpunit"
