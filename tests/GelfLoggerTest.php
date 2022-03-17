@@ -507,7 +507,7 @@ class GelfLoggerTest extends Orchestra
             $attribute->setAccessible(true);
 
             return $attribute->getValue($object);
-        } catch (Exception $e) {
+        } catch (Exception) {
             throw new Exception('Cannot get attribute from the provided object');
         }
     }
@@ -523,16 +523,18 @@ class GelfLoggerTest extends Orchestra
             $reflector = new ReflectionClass($class);
 
             return $reflector->getConstant($constant);
-        } catch (Exception $e) {
+        } catch (Exception) {
             throw new Exception('Cannot get attribute from the provided class');
         }
     }
 
+    /**
+     * Merge a given config to the global config.
+     */
     protected function mergeConfig(string $key, array $values): void
     {
-        $this->app['config']->set(
-            $key,
-            array_merge($this->app['config']->get($key), $values)
-        );
+        $config = $this->app['config'];
+
+        $config->set($key, array_merge($config->get($key), $values));
     }
 }
