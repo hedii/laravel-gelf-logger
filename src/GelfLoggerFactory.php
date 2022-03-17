@@ -25,8 +25,6 @@ class GelfLoggerFactory
 
     public function __invoke(array $config): Logger
     {
-        $ignoreError = $config['ignore_error'] ?? true;
-
         $transport = $this->getTransport(
             $config['transport'] ?? 'udp',
             $config['host'] ?? '127.0.0.1',
@@ -35,7 +33,7 @@ class GelfLoggerFactory
             $this->enableSsl($config) ? $this->sslOptions($config['ssl_options'] ?? null) : null
         );
 
-        if ($ignoreError) {
+        if ($config['ignore_error'] ?? true) {
             $transport = new IgnoreErrorTransportWrapper($transport);
         }
 
