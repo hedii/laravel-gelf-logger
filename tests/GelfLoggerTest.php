@@ -2,7 +2,6 @@
 
 namespace Hedii\LaravelGelfLogger\Tests;
 
-use Exception;
 use Gelf\Publisher;
 use Gelf\Transport\HttpTransport;
 use Gelf\Transport\IgnoreErrorTransportWrapper;
@@ -14,37 +13,16 @@ use Illuminate\Support\Facades\Log;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
 use Monolog\Logger;
-use Orchestra\Testbench\TestCase as Orchestra;
-use ReflectionClass;
 
-class GelfLoggerTest extends Orchestra
+class GelfLoggerTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
-    protected function getEnvironmentSetUp($app): void
-    {
-        $app['config']->set('logging.default', 'gelf');
-        $app['config']->set('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-            'level' => 'notice',
-            'name' => 'my-custom-name',
-            'host' => '127.0.0.2',
-            'port' => 12202,
-            'ignore_error' => false,
-        ]);
-    }
-
     /** @test */
     public function it_should_have_a_gelf_log_channel(): void
     {
         $logger = Log::channel('gelf');
 
         $this->assertInstanceOf(Logger::class, $logger->getLogger());
-        $this->assertSame($logger->getName(), 'my-custom-name');
+        $this->assertSame('my-custom-name', $logger->getName());
         $this->assertCount(1, $logger->getHandlers());
 
         $handler = $logger->getHandlers()[0];
@@ -312,8 +290,8 @@ class GelfLoggerTest extends Orchestra
 
         $this->assertFalse($sslOptions->getVerifyPeer());
         $this->assertTrue($sslOptions->getAllowSelfSigned());
-        $this->assertEquals('/path/to/ca.pem', $sslOptions->getCaFile());
-        $this->assertEquals('TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256', $sslOptions->getCiphers());
+        $this->assertSame('/path/to/ca.pem', $sslOptions->getCaFile());
+        $this->assertSame('TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256', $sslOptions->getCiphers());
     }
 
 
@@ -492,49 +470,5 @@ class GelfLoggerTest extends Orchestra
         $transport = $publisher->getTransports()[0];
 
         $this->assertInstanceOf(TcpTransport::class, $transport);
-    }
-
-    /**
-     * Get protected or private attribute from an object.
-     *
-     * @throws \Exception
-     */
-    protected function getAttribute(object $object, string $property): mixed
-    {
-        try {
-            $reflector = new ReflectionClass($object);
-            $attribute = $reflector->getProperty($property);
-            $attribute->setAccessible(true);
-
-            return $attribute->getValue($object);
-        } catch (Exception) {
-            throw new Exception('Cannot get attribute from the provided object');
-        }
-    }
-
-    /**
-     * Get protected or private constant from a class.
-     *
-     * @throws \Exception
-     */
-    protected function getConstant(string $class, string $constant): mixed
-    {
-        try {
-            $reflector = new ReflectionClass($class);
-
-            return $reflector->getConstant($constant);
-        } catch (Exception) {
-            throw new Exception('Cannot get attribute from the provided class');
-        }
-    }
-
-    /**
-     * Merge a given config to the global config.
-     */
-    protected function mergeConfig(string $key, array $values): void
-    {
-        $config = $this->app['config'];
-
-        $config->set($key, array_merge($config->get($key), $values));
     }
 }
