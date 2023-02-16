@@ -12,6 +12,7 @@ use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
+use Monolog\Level;
 use Monolog\Logger;
 
 class GelfLoggerTest extends TestCase
@@ -28,7 +29,7 @@ class GelfLoggerTest extends TestCase
         $handler = $logger->getHandlers()[0];
 
         $this->assertInstanceOf(GelfHandler::class, $handler);
-        $this->assertSame(Logger::NOTICE, $handler->getLevel());
+        $this->assertSame(Level::Notice, $handler->getLevel());
         $this->assertInstanceOf(GelfMessageFormatter::class, $handler->getFormatter());
 
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
@@ -214,7 +215,7 @@ class GelfLoggerTest extends TestCase
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
-        $this->assertSame(HttpTransport::DEFAULT_PATH, $this->getAttribute($transport, 'path'));
+        $this->assertSame('/gelf', $this->getAttribute($transport, 'path'));
     }
 
     /** @test */
@@ -231,7 +232,7 @@ class GelfLoggerTest extends TestCase
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
-        $this->assertSame(HttpTransport::DEFAULT_PATH, $this->getAttribute($transport, 'path'));
+        $this->assertSame('/gelf', $this->getAttribute($transport, 'path'));
     }
 
     /** @test */
