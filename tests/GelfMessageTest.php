@@ -2,6 +2,7 @@
 
 namespace Hedii\LaravelGelfLogger\Tests;
 
+use DateTimeImmutable;
 use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
 use Monolog\Level;
@@ -21,12 +22,12 @@ class GelfMessageTest extends TestCase
         ]);
 
         $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format(new LogRecord(
-            new \DateTimeImmutable(),
-            'gelf',
-            Level::Debug,
-            'test',
-            ['id' => '777', 'message' => 'custom'],
-            ['ip' => '127.0.0.1', 'source' => 'tests'],
+            datetime: new DateTimeImmutable(),
+            channel: 'gelf',
+            level: Level::Debug,
+            message: 'test',
+            context: ['id' => '777', 'message' => 'custom'],
+            extra: ['ip' => '127.0.0.1', 'source' => 'tests'],
         ));
 
         $this->assertArrayHasKey('extra_ip', $formattedMessage->getAllAdditionals());
@@ -45,12 +46,12 @@ class GelfMessageTest extends TestCase
         ]);
 
         $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format(new LogRecord(
-            new \DateTimeImmutable(),
-            'gelf',
-            Level::Debug,
-            'test',
-            ['id' => '777'],
-            ['ip' => '127.0.0.1'],
+            datetime: new DateTimeImmutable(),
+            channel: 'gelf',
+            level: Level::Debug,
+            message: 'test',
+            context: ['id' => '777'],
+            extra: ['ip' => '127.0.0.1'],
         ));
 
         $this->assertArrayHasKey('ip', $formattedMessage->getAllAdditionals());
@@ -69,12 +70,12 @@ class GelfMessageTest extends TestCase
         ]);
 
         $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format(new LogRecord(
-            new \DateTimeImmutable(),
-            'test_channel',
-            Level::Debug,
-            'test',
-            ['id' => '777'],
-            ['ip' => '127.0.0.1'],
+            datetime: new DateTimeImmutable(),
+            channel: 'test_channel',
+            level: Level::Debug,
+            message: 'test',
+            context: ['id' => '777'],
+            extra: ['ip' => '127.0.0.1'],
         ));
 
         $this->assertArrayHasKey('ip', $formattedMessage->getAllAdditionals());
