@@ -10,8 +10,10 @@ use Gelf\Transport\TcpTransport;
 use Gelf\Transport\UdpTransport;
 use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
+use LogicException;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
+use Monolog\Level;
 use Monolog\Logger;
 
 class GelfLoggerTest extends TestCase
@@ -28,7 +30,7 @@ class GelfLoggerTest extends TestCase
         $handler = $logger->getHandlers()[0];
 
         $this->assertInstanceOf(GelfHandler::class, $handler);
-        $this->assertSame(Logger::NOTICE, $handler->getLevel());
+        $this->assertSame(Level::Notice, $handler->getLevel());
         $this->assertInstanceOf(GelfMessageFormatter::class, $handler->getFormatter());
 
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
@@ -41,7 +43,7 @@ class GelfLoggerTest extends TestCase
     /** @test */
     public function it_should_not_have_any_processor_if_the_config_does_not_have_processors(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('You tried to pop from an empty processor stack.');
 
         $logger = Log::channel('gelf');
@@ -214,7 +216,10 @@ class GelfLoggerTest extends TestCase
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
-        $this->assertSame(HttpTransport::DEFAULT_PATH, $this->getAttribute($transport, 'path'));
+        $this->assertSame(
+            $this->getConstant(HttpTransport::class, 'DEFAULT_PATH'),
+            $this->getAttribute($transport, 'path')
+        );
     }
 
     /** @test */
@@ -231,7 +236,10 @@ class GelfLoggerTest extends TestCase
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
-        $this->assertSame(HttpTransport::DEFAULT_PATH, $this->getAttribute($transport, 'path'));
+        $this->assertSame(
+            $this->getConstant(HttpTransport::class, 'DEFAULT_PATH'),
+            $this->getAttribute($transport, 'path')
+        );
     }
 
     /** @test */

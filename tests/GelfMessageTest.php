@@ -2,8 +2,11 @@
 
 namespace Hedii\LaravelGelfLogger\Tests;
 
+use DateTimeImmutable;
 use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
+use Monolog\Level;
+use Monolog\LogRecord;
 
 class GelfMessageTest extends TestCase
 {
@@ -18,13 +21,14 @@ class GelfMessageTest extends TestCase
             'extra_prefix' => 'extra_',
         ]);
 
-        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format([
-            'datetime' => '1591097093.0',
-            'message' => 'test',
-            'level' => 100,
-            'extra' => ['ip' => '127.0.0.1', 'source' => 'tests'],
-            'context' => ['id' => '777', 'message' => 'custom'],
-        ]);
+        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format(new LogRecord(
+            datetime: new DateTimeImmutable(),
+            channel: 'gelf',
+            level: Level::Debug,
+            message: 'test',
+            context: ['id' => '777', 'message' => 'custom'],
+            extra: ['ip' => '127.0.0.1', 'source' => 'tests'],
+        ));
 
         $this->assertArrayHasKey('extra_ip', $formattedMessage->getAllAdditionals());
         $this->assertArrayHasKey('extra_source', $formattedMessage->getAllAdditionals());
@@ -41,13 +45,14 @@ class GelfMessageTest extends TestCase
             'via' => GelfLoggerFactory::class,
         ]);
 
-        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format([
-            'datetime' => '1591097093.0',
-            'message' => 'test',
-            'level' => 100,
-            'extra' => ['ip' => '127.0.0.1'],
-            'context' => ['id' => '777'],
-        ]);
+        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format(new LogRecord(
+            datetime: new DateTimeImmutable(),
+            channel: 'gelf',
+            level: Level::Debug,
+            message: 'test',
+            context: ['id' => '777'],
+            extra: ['ip' => '127.0.0.1'],
+        ));
 
         $this->assertArrayHasKey('ip', $formattedMessage->getAllAdditionals());
         $this->assertArrayHasKey('id', $formattedMessage->getAllAdditionals());
@@ -64,13 +69,14 @@ class GelfMessageTest extends TestCase
             'extra_prefix' => null,
         ]);
 
-        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format([
-            'datetime' => '1591097093.0',
-            'message' => 'test',
-            'level' => 100,
-            'extra' => ['ip' => '127.0.0.1'],
-            'context' => ['id' => '777'],
-        ]);
+        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format(new LogRecord(
+            datetime: new DateTimeImmutable(),
+            channel: 'test_channel',
+            level: Level::Debug,
+            message: 'test',
+            context: ['id' => '777'],
+            extra: ['ip' => '127.0.0.1'],
+        ));
 
         $this->assertArrayHasKey('ip', $formattedMessage->getAllAdditionals());
         $this->assertArrayHasKey('id', $formattedMessage->getAllAdditionals());
