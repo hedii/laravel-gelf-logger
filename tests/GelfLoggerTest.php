@@ -215,7 +215,10 @@ class GelfLoggerTest extends TestCase
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
-        $this->assertSame('/gelf', $this->getAttribute($transport, 'path'));
+        $this->assertSame(
+            $this->getConstant(HttpTransport::class, 'DEFAULT_PATH'),
+            $this->getAttribute($transport, 'path')
+        );
     }
 
     /** @test */
@@ -232,7 +235,10 @@ class GelfLoggerTest extends TestCase
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
-        $this->assertSame('/gelf', $this->getAttribute($transport, 'path'));
+        $this->assertSame(
+            $this->getConstant(HttpTransport::class, 'DEFAULT_PATH'),
+            $this->getAttribute($transport, 'path')
+        );
     }
 
     /** @test */
