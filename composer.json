@@ -31,8 +31,7 @@
         "illuminate/log": "^10.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.0",
-        "phpunit/phpunit": "^10.0"
+        "orchestra/testbench": "^8.0"
     },
     "autoload": {
         "psr-4": {
