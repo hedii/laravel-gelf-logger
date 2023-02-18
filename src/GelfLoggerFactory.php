@@ -103,7 +103,7 @@ class GelfLoggerFactory
             return false;
         }
 
-        return $config['ssl'] ?? false;
+        return $config['ssl'];
     }
 
     protected function sslOptions(?array $sslConfig = null): SslOptions
@@ -114,10 +114,10 @@ class GelfLoggerFactory
             return $sslOptions;
         }
 
-        $sslOptions->setVerifyPeer($sslConfig['verify_peer'] ?? true);
-        $sslOptions->setCaFile($sslConfig['ca_file'] ?? null);
-        $sslOptions->setCiphers($sslConfig['ciphers'] ?? null);
-        $sslOptions->setAllowSelfSigned($sslConfig['allow_self_signed'] ?? false);
+        $sslOptions->setVerifyPeer($sslConfig['verify_peer']);
+        $sslOptions->setCaFile($sslConfig['ca_file']);
+        $sslOptions->setCiphers($sslConfig['ciphers']);
+        $sslOptions->setAllowSelfSigned($sslConfig['allow_self_signed']);
 
         return $sslOptions;
     }
