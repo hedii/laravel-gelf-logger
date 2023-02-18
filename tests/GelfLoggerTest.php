@@ -10,6 +10,7 @@ use Gelf\Transport\TcpTransport;
 use Gelf\Transport\UdpTransport;
 use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
+use LogicException;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
 use Monolog\Level;
@@ -42,7 +43,7 @@ class GelfLoggerTest extends TestCase
     /** @test */
     public function it_should_not_have_any_processor_if_the_config_does_not_have_processors(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('You tried to pop from an empty processor stack.');
 
         $logger = Log::channel('gelf');
