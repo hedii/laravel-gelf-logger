@@ -25,15 +25,17 @@ class GelfLoggerFactory
 
     public function __invoke(array $config): Logger
     {
+        $config = $this->parseConfig($config);
+
         $transport = $this->getTransport(
-            $config['transport'] ?? 'udp',
-            $config['host'] ?? '127.0.0.1',
-            $config['port'] ?? 12201,
-            $config['path'] ?? null,
-            $this->enableSsl($config) ? $this->sslOptions($config['ssl_options'] ?? null) : null
+            $config['transport'],
+            $config['host'],
+            $config['port'],
+            $config['path'],
+            $this->enableSsl($config) ? $this->sslOptions($config['ssl_options']) : null
         );
 
-        if ($config['ignore_error'] ?? true) {
+        if ($config['ignore_error']) {
             $transport = new IgnoreErrorTransportWrapper($transport);
         }
 
@@ -41,10 +43,10 @@ class GelfLoggerFactory
 
         $handler->setFormatter(
             new GelfMessageFormatter(
-                $config['system_name'] ?? null,
-                $config['extra_prefix'] ?? null,
-                $config['context_prefix'] ?? '',
-                $config['max_length'] ?? null
+                $config['system_name'],
+                $config['extra_prefix'],
+                $config['context_prefix'],
+                $config['max_length']
             )
         );
 
@@ -53,6 +55,30 @@ class GelfLoggerFactory
         }
 
         return new Logger($this->parseChannel($config), [$handler]);
+    }
+
+    protected function parseConfig(array $config): array
+    {
+        $config['transport'] ??= 'udp';
+        $config['host'] ??= '127.0.0.1';
+        $config['port'] ??= 12201;
+        $config['path'] ??= null;
+        $config['system_name'] ??= null;
+        $config['extra_prefix'] ??= null;
+        $config['context_prefix'] ??= '';
+        $config['max_length'] ??= null;
+        $config['ignore_error'] ??= true;
+        $config['ssl'] ??= false;
+        $config['ssl_options'] ??= null;
+
+        if ($config['ssl_options']) {
+            $config['ssl_options']['verify_peer'] ??= true;
+            $config['ssl_options']['ca_file'] ??= null;
+            $config['ssl_options']['ciphers'] ??= null;
+            $config['ssl_options']['allow_self_signed'] ??= false;
+        }
+
+        return $config;
     }
 
     protected function getTransport(
