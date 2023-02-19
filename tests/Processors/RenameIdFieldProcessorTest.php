@@ -21,31 +21,32 @@ class RenameIdFieldProcessorTest extends TestCase
             channel: 'gelf',
             level: Level::Debug,
             message: 'message',
-            context: $payloadContext);
+            context: $payloadContext
+        );
 
         $processor = new RenameIdFieldProcessor();
 
         $this->assertSame($expected, $processor($payload)->context);
     }
 
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         return [
-            'have_neither_underscore_id_nor_id' => [
+            'having neither underscore id nor id' => [
                 ['someotherfield' => 'someothervalue'],
-                ['someotherfield' => 'someothervalue']
+                ['someotherfield' => 'someothervalue'],
             ],
-            'having_id_and_underscore_id' => [
+            'having id and underscore id' => [
                 ['id' => 'bar', '_id' => 'bar2'],
-                ['_id' => 'bar']
+                ['_id' => 'bar'],
             ],
-            'having_id_and_not_underscore_id' => [
+            'having id and not underscore id' => [
                 ['id' => 'bar'],
-                ['_id' => 'bar']
+                ['_id' => 'bar'],
             ],
-            'having_no_id_and_underscore_id' => [
+            'having no id and underscore id' => [
                 ['_id' => 'bar', 'field1' => 'value1'],
-                ['_id' => 'bar', 'field1' => 'value1']
+                ['_id' => 'bar', 'field1' => 'value1'],
             ],
         ];
     }

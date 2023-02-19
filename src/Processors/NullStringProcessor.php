@@ -11,16 +11,14 @@ class NullStringProcessor
      */
     public function __invoke(LogRecord $record): LogRecord
     {
-        $newContext = [];
+        $context = $record->context;
 
-        foreach ($record->context as $key => $value) {
+        foreach ($context as $key => $value) {
             if (is_string($value) && strtoupper($value) === 'NULL') {
-                $newContext[$key] = null;
-            } else {
-                $newContext[$key] = $value;
+                $context[$key] = null;
             }
         }
 
-        return $record->with(context: $newContext);
+        return $record->with(context: $context);
     }
 }

@@ -13,13 +13,13 @@ class RenameIdFieldProcessor
      */
     public function __invoke(LogRecord $record): LogRecord
     {
-        $newContext = $record->context;
+        $context = $record->context;
 
-        if (array_key_exists('id', $newContext)) {
-            $newContext['_id'] = $newContext['id'];
-            unset($newContext['id']);
+        if (array_key_exists('id', $context)) {
+            $context['_id'] = $context['id'];
+            unset($context['id']);
         }
 
-        return $record->with(context: $newContext);
+        return $record->with(context: $context);
     }
 }

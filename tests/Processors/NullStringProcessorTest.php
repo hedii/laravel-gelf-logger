@@ -17,12 +17,15 @@ class NullStringProcessorTest extends TestCase
         $payload = new LogRecord(
             datetime: new DateTimeImmutable(),
             channel: 'gelf',
-            level: Level::Debug, message: 'message', context: [
-            'key1' => 'bar',
-            'key2' => 'NULL',
-            'key3' => 'null',
-            'key4' => null,
-        ]);
+            level: Level::Debug,
+            message: 'message',
+            context: [
+                'key1' => 'bar',
+                'key2' => 'NULL',
+                'key3' => 'null',
+                'key4' => null,
+            ]
+        );
 
         $processor = new NullStringProcessor();
 
