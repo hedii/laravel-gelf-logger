@@ -2,19 +2,23 @@
 
 namespace Hedii\LaravelGelfLogger\Processors;
 
+use Monolog\LogRecord;
+
 class NullStringProcessor
 {
     /**
      * Transform a "NULL" string record into a null value.
      */
-    public function __invoke(array $record): array
+    public function __invoke(LogRecord $record): LogRecord
     {
-        foreach ($record['context'] as $key => $value) {
+        $context = $record->context;
+
+        foreach ($context as $key => $value) {
             if (is_string($value) && strtoupper($value) === 'NULL') {
-                $record['context'][$key] = null;
+                $context[$key] = null;
             }
         }
 
-        return $record;
+        return $record->with(context: $context);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Hedii\LaravelGelfLogger\Processors;
 
+use Monolog\LogRecord;
+
 class RenameIdFieldProcessor
 {
     /**
@@ -9,16 +11,15 @@ class RenameIdFieldProcessor
      *
      * @see https://github.com/hedii/laravel-gelf-logger/issues/33
      */
-    public function __invoke(array $record): array
+    public function __invoke(LogRecord $record): LogRecord
     {
-        foreach ($record['context'] as $key => $value) {
-            if ($key === 'id' && ! array_key_exists('_id', $record['context'])) {
-                unset($record['context']['id']);
+        $context = $record->context;
 
-                $record['context']['_id'] = $value;
-            }
+        if (array_key_exists('id', $context)) {
+            $context['_id'] = $context['id'];
+            unset($context['id']);
         }
 
-        return $record;
+        return $record->with(context: $context);
     }
 }
