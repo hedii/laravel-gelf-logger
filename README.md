@@ -96,6 +96,10 @@ return [
             // This optional option determines the port on which the gelf
             // receiver host is listening. Default is 12201
             'port' => 12201,
+            
+            // This optional option determines the chunk size used when
+            // transferring message via UDP transport. Default is 1420.
+            'chunk_size' => 1420,
 
             // This optional option determines the path used for the HTTP
             // transport. When forgotten or set to null, default path '/gelf'

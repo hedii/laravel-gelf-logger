@@ -31,6 +31,7 @@ class GelfLoggerFactory
             $config['transport'],
             $config['host'],
             $config['port'],
+            $config['chunk_size'],
             $config['path'],
             $this->enableSsl($config) ? $this->sslOptions($config['ssl_options']) : null
         );
@@ -62,6 +63,7 @@ class GelfLoggerFactory
         $config['transport'] ??= 'udp';
         $config['host'] ??= '127.0.0.1';
         $config['port'] ??= 12201;
+        $config['chunk_size'] ??= UdpTransport::CHUNK_SIZE_WAN;
         $config['path'] ??= null;
         $config['system_name'] ??= null;
         $config['extra_prefix'] ??= null;
@@ -85,6 +87,7 @@ class GelfLoggerFactory
         string $transport,
         string $host,
         int $port,
+        int $chunkSize,
         ?string $path = null,
         ?SslOptions $sslOptions = null
     ): AbstractTransport {
@@ -93,7 +96,7 @@ class GelfLoggerFactory
             'http' => $path
                 ? new HttpTransport($host, $port, $path, $sslOptions)
                 : new HttpTransport($host, $port, sslOptions: $sslOptions),
-            default => new UdpTransport($host, $port),
+            default => new UdpTransport($host, $port, $chunkSize),
         };
     }
 
