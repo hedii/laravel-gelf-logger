@@ -3,8 +3,9 @@
 namespace Hedii\LaravelGelfLogger\Processors;
 
 use Monolog\LogRecord;
+use Monolog\Processor\ProcessorInterface;
 
-class RenameIdFieldProcessor
+class RenameIdFieldProcessor implements ProcessorInterface
 {
     /**
      * Rename "id" field  to "_id" (additional field 'id' is not allowed).

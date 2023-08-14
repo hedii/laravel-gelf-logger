@@ -3,8 +3,9 @@
 namespace Hedii\LaravelGelfLogger\Processors;
 
 use Monolog\LogRecord;
+use Monolog\Processor\ProcessorInterface;
 
-class NullStringProcessor
+class NullStringProcessor implements ProcessorInterface
 {
     /**
      * Transform a "NULL" string record into a null value.
