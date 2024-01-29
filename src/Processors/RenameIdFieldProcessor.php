@@ -12,12 +12,16 @@ class RenameIdFieldProcessor implements ProcessorInterface
      *
      * @see https://github.com/hedii/laravel-gelf-logger/issues/33
      */
+    public function __construct(private readonly string $fieldField = '_id')
+    {
+    }
+
     public function __invoke(LogRecord $record): LogRecord
     {
         $context = $record->context;
 
         if (array_key_exists('id', $context)) {
-            $context['_id'] = $context['id'];
+            $context[$this->fieldField] = $context['id'];
             unset($context['id']);
         }
 
