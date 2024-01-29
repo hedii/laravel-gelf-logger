@@ -14,7 +14,7 @@ class RenameIdFieldProcessorTest extends TestCase
      * @test
      * @dataProvider dataProvider
      */
-    public function it_should_rename_id_field(array $payloadContext, array $expected): void
+    public function it_should_rename_id_field(array $payloadContext, array $expected, string $fieldName = '_id'): void
     {
         $payload = new LogRecord(
             datetime: new DateTimeImmutable(),
@@ -24,7 +24,7 @@ class RenameIdFieldProcessorTest extends TestCase
             context: $payloadContext
         );
 
-        $processor = new RenameIdFieldProcessor();
+        $processor = new RenameIdFieldProcessor($fieldName);
 
         $this->assertSame($expected, $processor($payload)->context);
     }
@@ -47,6 +47,11 @@ class RenameIdFieldProcessorTest extends TestCase
             'having no id and underscore id' => [
                 ['_id' => 'bar', 'field1' => 'value1'],
                 ['_id' => 'bar', 'field1' => 'value1'],
+            ],
+            'having custom id filedName configuration' => [
+                ['id' => 'bar'],
+                ['_other_key' => 'bar'],
+                '_other_key',
             ],
         ];
     }

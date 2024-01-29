@@ -51,8 +51,8 @@ class GelfLoggerFactory
             )
         );
 
-        foreach ($this->parseProcessors($config) as $processor) {
-            $handler->pushProcessor(new $processor);
+        foreach ($this->prepareProcessors($config) as $processor) {
+            $handler->pushProcessor($processor);
         }
 
         return new Logger($this->parseChannel($config), [$handler]);
@@ -125,17 +125,11 @@ class GelfLoggerFactory
         return $sslOptions;
     }
 
-    protected function parseProcessors(array $config): array
+    protected function prepareProcessors(array $config): array
     {
-        $processors = [];
-
-        if (isset($config['processors']) && is_array($config['processors'])) {
-            foreach ($config['processors'] as $processor) {
-                $processors[] = $processor;
-            }
-        }
-
-        return $processors;
+        return collect($config['processors'] ?? [])
+            ->map(fn ($processor) => $this->app->make($processor['processor'] ?? $processor, $processor['with'] ?? []))
+            ->toArray();
     }
 
     protected function getFallbackChannelName(): string
