@@ -2,16 +2,16 @@
 
 namespace Hedii\LaravelGelfLogger\Tests\Processors;
 
-use Carbon\Carbon;
 use DateTimeImmutable;
 use Hedii\LaravelGelfLogger\Processors\NullStringProcessor;
 use Monolog\Level;
 use Monolog\LogRecord;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class NullStringProcessorTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_should_transform_null_string_to_null(): void
     {
         $payload = new LogRecord(

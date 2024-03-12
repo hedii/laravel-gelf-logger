@@ -5,10 +5,11 @@ namespace Hedii\LaravelGelfLogger\Tests;
 use Hedii\LaravelGelfLogger\Tests\Fake\AnotherTestProcessor;
 use Hedii\LaravelGelfLogger\Tests\Fake\TestProcessor;
 use Illuminate\Support\Facades\Log;
+use PHPUnit\Framework\Attributes\Test;
 
 class ProcessorTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_should_have_the_configured_processors(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
