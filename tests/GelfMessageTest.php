@@ -7,10 +7,11 @@ use Hedii\LaravelGelfLogger\GelfLoggerFactory;
 use Illuminate\Support\Facades\Log;
 use Monolog\Level;
 use Monolog\LogRecord;
+use PHPUnit\Framework\Attributes\Test;
 
 class GelfMessageTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_should_append_prefixes(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -36,7 +37,7 @@ class GelfMessageTest extends TestCase
         $this->assertArrayHasKey('ctxt_message', $formattedMessage->getAllAdditionals());
     }
 
-    /** @test */
+    #[Test]
     public function it_should_not_append_prefixes(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -58,7 +59,7 @@ class GelfMessageTest extends TestCase
         $this->assertArrayHasKey('id', $formattedMessage->getAllAdditionals());
     }
 
-    /** @test */
+    #[Test]
     public function null_config_variables_should_not_add_prefixes(): void
     {
         $this->mergeConfig('logging.channels.gelf', [

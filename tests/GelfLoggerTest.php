@@ -15,10 +15,11 @@ use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
 use Monolog\Level;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\Test;
 
 class GelfLoggerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_should_have_a_gelf_log_channel(): void
     {
         $logger = Log::channel('gelf');
@@ -40,7 +41,7 @@ class GelfLoggerTest extends TestCase
         $this->assertInstanceOf(UdpTransport::class, $transport);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_not_have_any_processor_if_the_config_does_not_have_processors(): void
     {
         $this->expectException(LogicException::class);
@@ -52,7 +53,7 @@ class GelfLoggerTest extends TestCase
         $handler->popProcessor();
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_system_name_to_current_hostname_if_system_name_is_null(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -69,7 +70,7 @@ class GelfLoggerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_system_name_to_custom_value_if_system_name_config_is_provided(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -86,7 +87,7 @@ class GelfLoggerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_should_call_the_tcp_transport_method_when_provided(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -102,7 +103,7 @@ class GelfLoggerTest extends TestCase
         $this->assertInstanceOf(TcpTransport::class, $transport);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_call_the_udp_transport_method_when_nothing_is_provided(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -117,7 +118,7 @@ class GelfLoggerTest extends TestCase
         $this->assertInstanceOf(UdpTransport::class, $transport);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_max_length_if_max_length_is_provided(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -134,7 +135,7 @@ class GelfLoggerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_should_use_default_max_length_when_max_length_is_not_provided(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -150,7 +151,7 @@ class GelfLoggerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_should_use_default_max_length_when_max_length_is_null(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -167,7 +168,7 @@ class GelfLoggerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_should_call_the_http_transport_method_when_provided(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -183,7 +184,7 @@ class GelfLoggerTest extends TestCase
         $this->assertInstanceOf(HttpTransport::class, $transport);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_path_if_path_is_provided(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -201,7 +202,7 @@ class GelfLoggerTest extends TestCase
         $this->assertSame('/custom-path', $this->getAttribute($transport, 'path'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_path_to_default_path_if_path_is_null(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -222,7 +223,7 @@ class GelfLoggerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_path_to_default_path_if_path_is_not_provided(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -242,7 +243,7 @@ class GelfLoggerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_the_ssl_options_for_tcp_transport(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -272,7 +273,7 @@ class GelfLoggerTest extends TestCase
         $this->assertEquals('TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256', $sslOptions->getCiphers());
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_the_ssl_options_for_http_transport(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -303,7 +304,7 @@ class GelfLoggerTest extends TestCase
     }
 
 
-    /** @test */
+    #[Test]
     public function it_should_not_add_ssl_on_tcp_transport_when_the_ssl_config_is_missing_or_set_to_false(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -346,7 +347,7 @@ class GelfLoggerTest extends TestCase
         $this->assertNull($this->getAttribute($transport, 'sslOptions'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_not_add_ssl_on_http_transport_when_the_ssl_config_is_missing_or_set_to_false(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -387,7 +388,7 @@ class GelfLoggerTest extends TestCase
         $this->assertNull($this->getAttribute($transport, 'sslOptions'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_use_the_default_ssl_options_when_ssl_options_is_missing(): void
     {
         $this->mergeConfig('logging.channels.gelf', [
@@ -431,7 +432,7 @@ class GelfLoggerTest extends TestCase
         $this->assertNull($sslOptions->getCiphers());
     }
 
-    /** @test */
+    #[Test]
     public function it_should_ignore_errors_when_the_ignore_error_config_is_missing_or_set_to_false(): void
     {
         $this->app['config']->set('logging.default', 'gelf');

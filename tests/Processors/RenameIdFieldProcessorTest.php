@@ -6,14 +6,14 @@ use DateTimeImmutable;
 use Hedii\LaravelGelfLogger\Processors\RenameIdFieldProcessor;
 use Monolog\Level;
 use Monolog\LogRecord;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class RenameIdFieldProcessorTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider dataProvider
-     */
+    #[Test]
+    #[DataProvider('dataProvider')]
     public function it_should_rename_id_field(array $payloadContext, array $expected): void
     {
         $payload = new LogRecord(
