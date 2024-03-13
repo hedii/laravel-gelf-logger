@@ -31,7 +31,7 @@
         "illuminate/log": "^11.0"
     },
     "require-dev": {
-        "orchestra/testbench": "9.x-dev"
+        "orchestra/testbench": "^9.0"
     },
     "autoload": {
         "psr-4": {
@@ -48,6 +48,5 @@
     },
     "scripts": {
         "test": "vendor/bin/phpunit"
-    },
-    "minimum-stability": "dev"
+    }
 }
