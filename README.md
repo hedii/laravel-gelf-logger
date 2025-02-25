@@ -16,6 +16,7 @@
 | 9.0         | ^7.0                    |
 | 10.0        | ^8.0                    |
 | 11.0        | ^9.0                    |
+| 12.0        | ^10.0                   |
 
 A package to send [gelf](http://docs.graylog.org/en/2.1/pages/gelf.html) logs to a gelf compatible backend like graylog. It is a Laravel wrapper for [bzikarsky/gelf-php](https://github.com/bzikarsky/gelf-php) package.
 
