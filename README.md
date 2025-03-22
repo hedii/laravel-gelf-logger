@@ -130,6 +130,17 @@ return [
                 // false.
                 'allow_self_signed' => false,
             ],
+            
+            // If you want to send messages to the gelf server using http basic
+            // authentication, the following configuration is used. Only useful
+            // if transport is set to http.
+            'http_basic_auth' => [
+                // The http basic authentication username.
+                'username' => null,
+                
+                // The http basic authentication password.
+                'password' => null,
+            ],
 
             // This optional option determines the maximum length per message
             // field. When forgotten or set to null, the default value of 

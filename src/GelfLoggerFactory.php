@@ -36,6 +36,14 @@ class GelfLoggerFactory
             $this->enableSsl($config) ? $this->sslOptions($config['ssl_options']) : null
         );
 
+        if ($this->enableBasicAuthentication($transport, $config)) {
+            /** @var HttpTransport $transport */
+            $transport->setAuthentication(
+                $config['http_basic_auth']['username'],
+                $config['http_basic_auth']['password'],
+            );
+        }
+
         if ($config['ignore_error']) {
             $transport = new IgnoreErrorTransportWrapper($transport);
         }
@@ -72,12 +80,18 @@ class GelfLoggerFactory
         $config['ignore_error'] ??= true;
         $config['ssl'] ??= false;
         $config['ssl_options'] ??= null;
+        $config['http_basic_auth'] ??= null;
 
         if ($config['ssl_options']) {
             $config['ssl_options']['verify_peer'] ??= true;
             $config['ssl_options']['ca_file'] ??= null;
             $config['ssl_options']['ciphers'] ??= null;
             $config['ssl_options']['allow_self_signed'] ??= false;
+        }
+
+        if ($config['http_basic_auth']) {
+            $config['http_basic_auth']['username'] ??= null;
+            $config['http_basic_auth']['password'] ??= null;
         }
 
         return $config;
@@ -123,6 +137,15 @@ class GelfLoggerFactory
         $sslOptions->setAllowSelfSigned($sslConfig['allow_self_signed']);
 
         return $sslOptions;
+    }
+
+    protected function enableBasicAuthentication(AbstractTransport $transport, array $config): bool
+    {
+        return $transport instanceof HttpTransport
+            && $config['http_basic_auth']
+            && $config['http_basic_auth']['username']
+            && $config['http_basic_auth']['password'];
+
     }
 
     protected function parseProcessors(array $config): array

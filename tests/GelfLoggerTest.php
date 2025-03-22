@@ -480,4 +480,103 @@ class GelfLoggerTest extends TestCase
 
         $this->assertInstanceOf(TcpTransport::class, $transport);
     }
+
+    #[Test]
+    public function it_should_not_set_authentication_on_http_transport_if_http_basic_auth_is_not_fully_provided(): void
+    {
+        $this->mergeConfig('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http',
+        ]);
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $publisher->getTransports()[0];
+        $this->assertNull($this->getAttribute($transport, 'authentication'));
+
+        $this->mergeConfig('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http',
+            'http_basic_auth' => 'foo',
+        ]);
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $publisher->getTransports()[0];
+        $this->assertNull($this->getAttribute($transport, 'authentication'));
+
+        $this->mergeConfig('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http',
+            'http_basic_auth' => [
+                'username' => '',
+                'password' => 'my_password',
+            ],
+        ]);
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $publisher->getTransports()[0];
+        $this->assertNull($this->getAttribute($transport, 'authentication'));
+
+        $this->mergeConfig('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http',
+            'http_basic_auth' => [
+                'username' => 'my_username',
+                'password' => '',
+            ],
+        ]);
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $publisher->getTransports()[0];
+        $this->assertNull($this->getAttribute($transport, 'authentication'));
+
+        $this->mergeConfig('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http',
+            'http_basic_auth' => [
+                'username' => 'my_username',
+            ],
+        ]);
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $publisher->getTransports()[0];
+        $this->assertNull($this->getAttribute($transport, 'authentication'));
+
+        $this->mergeConfig('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http',
+            'http_basic_auth' => [
+                'password' => 'my_password',
+            ],
+        ]);
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $publisher->getTransports()[0];
+        $this->assertNull($this->getAttribute($transport, 'authentication'));
+    }
+
+    #[Test]
+    public function it_should_set_authentication_on_http_transport_if_http_basic_auth_is_provided(): void
+    {
+        $this->mergeConfig('logging.channels.gelf', [
+            'driver' => 'custom',
+            'via' => GelfLoggerFactory::class,
+            'transport' => 'http',
+            'http_basic_auth' => [
+                'username' => 'my_username',
+                'password' => 'my_password',
+            ],
+        ]);
+
+        $logger = Log::channel('gelf');
+        $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
+        $transport = $publisher->getTransports()[0];
+
+        $this->assertSame('my_username:my_password', $this->getAttribute($transport, 'authentication'));
+    }
 }
