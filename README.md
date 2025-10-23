@@ -1,26 +1,8 @@
-# Laravel Gelf Logger
+# Hypervel Gelf Logger
 
-[![Build Status](https://github.com/hedii/laravel-gelf-logger/workflows/Tests/badge.svg)](https://github.com/hedii/laravel-gelf-logger/actions)
-[![Total Downloads](https://poser.pugx.org/hedii/laravel-gelf-logger/downloads)](//packagist.org/packages/hedii/laravel-gelf-logger)
-[![License](https://poser.pugx.org/hedii/laravel-gelf-logger/license)](//packagist.org/packages/hedii/laravel-gelf-logger)
-[![Latest Stable Version](https://poser.pugx.org/hedii/laravel-gelf-logger/v)](//packagist.org/packages/hedii/laravel-gelf-logger)
+A package to send [gelf](http://docs.graylog.org/en/2.1/pages/gelf.html) logs to a gelf compatible backend like graylog. It is a Hypervel wrapper for [bzikarsky/gelf-php](https://github.com/bzikarsky/gelf-php) package.
 
-| **Laravel** | **laravel-gelf-logger** |
-|-------------|-------------------------|
-| 5.6         | ^3.0                    |
-| 5.8         | ^3.1                    |
-| 6.0         | ^4.0                    |
-| 7.0         | ^5.0                    |
-| 8.0         | ^5.3                    |
-| 8.0         | ^6.0 (with php 8)       |
-| 9.0         | ^7.0                    |
-| 10.0        | ^8.0                    |
-| 11.0        | ^9.0                    |
-| 12.0        | ^10.0                   |
-
-A package to send [gelf](http://docs.graylog.org/en/2.1/pages/gelf.html) logs to a gelf compatible backend like graylog. It is a Laravel wrapper for [bzikarsky/gelf-php](https://github.com/bzikarsky/gelf-php) package.
-
-It uses the new [Laravel custom log channel](https://laravel.com/docs/master/logging) introduced in Laravel 5.6.
+This package uses Hypervel's custom log channel system.
 
 A gelf receiver like graylog2 must be configured to receive messages with a GELF UDP, TCP or HTTP Input.
 
@@ -38,7 +20,7 @@ A gelf receiver like graylog2 must be configured to receive messages with a GELF
 Install via [composer](https://getcomposer.org/doc/00-intro.md)
 
 ```sh
-composer require hedii/laravel-gelf-logger
+composer require nuwber/hypervel-gelf-logger
 ```
 
 Edit `config/logging.php` to add the new `gelf` log channel.
@@ -59,7 +41,7 @@ return [
         'gelf' => [
             'driver' => 'custom',
 
-            'via' => \Hedii\LaravelGelfLogger\GelfLoggerFactory::class,
+            'via' => \Nuwber\HypervelGelfLogger\GelfLoggerFactory::class,
 
             // This optional option determines the processors that should be
             // pushed to the handler. This option is useful to modify a field
@@ -68,8 +50,8 @@ return [
             // __invoke method: see monolog documentation about processors.
             // Default is an empty array.
             'processors' => [
-                \Hedii\LaravelGelfLogger\Processors\NullStringProcessor::class,
-                \Hedii\LaravelGelfLogger\Processors\RenameIdFieldProcessor::class,
+                \Nuwber\HypervelGelfLogger\Processors\NullStringProcessor::class,
+                \Nuwber\HypervelGelfLogger\Processors\RenameIdFieldProcessor::class,
                 // another processor...
             ],
 
@@ -167,7 +149,7 @@ return [
 
 ## Usage
 
-Once you have modified the Laravel logging configuration, you can use the gelf log channel [as any Laravel log channel](https://laravel.com/docs/master/logging#writing-log-messages).
+Once you have modified the Hypervel logging configuration, you can use the gelf log channel as any Hypervel log channel.
 
 ### Example
 
@@ -192,4 +174,8 @@ composer test
 
 ## License
 
-laravel-gelf-logger is released under the MIT Licence. See the bundled [LICENSE](https://github.com/hedii/laravel-gelf-logger/blob/master/LICENSE.md) file for details.
+hypervel-gelf-logger is released under the MIT Licence. See the bundled LICENSE file for details.
+
+## Credits
+
+This package is a Hypervel port of [hedii/laravel-gelf-logger](https://github.com/hedii/laravel-gelf-logger).

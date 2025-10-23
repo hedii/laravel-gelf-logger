@@ -1,6 +1,8 @@
 <?php
 
-namespace Hedii\LaravelGelfLogger;
+declare(strict_types=1);
+
+namespace Nuwber\HypervelGelfLogger;
 
 use Gelf\Publisher;
 use Gelf\Transport\AbstractTransport;
@@ -9,17 +11,15 @@ use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\UdpTransport;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Log\ParsesLogConfiguration;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
+use Monolog\Level;
 use Monolog\Logger;
+use Psr\Container\ContainerInterface;
 
 class GelfLoggerFactory
 {
-    use ParsesLogConfiguration;
-
-    public function __construct(protected Container $app)
+    public function __construct(protected ContainerInterface $container)
     {
     }
 
@@ -48,7 +48,7 @@ class GelfLoggerFactory
             $transport = new IgnoreErrorTransportWrapper($transport);
         }
 
-        $handler = new GelfHandler(new Publisher($transport), $this->level($config));
+        $handler = new GelfHandler(new Publisher($transport), $this->parseLevel($config));
 
         $handler->setFormatter(
             new GelfMessageFormatter(
@@ -63,7 +63,7 @@ class GelfLoggerFactory
             $handler->pushProcessor(new $processor);
         }
 
-        return new Logger($this->parseChannel($config), [$handler]);
+        return new Logger($this->parseChannelName($config), [$handler]);
     }
 
     protected function parseConfig(array $config): array
@@ -89,7 +89,7 @@ class GelfLoggerFactory
             $config['ssl_options']['allow_self_signed'] ??= false;
         }
 
-        if ($config['http_basic_auth']) {
+        if ($config['http_basic_auth'] && is_array($config['http_basic_auth'])) {
             $config['http_basic_auth']['username'] ??= null;
             $config['http_basic_auth']['password'] ??= null;
         }
@@ -142,10 +142,10 @@ class GelfLoggerFactory
     protected function enableBasicAuthentication(AbstractTransport $transport, array $config): bool
     {
         return $transport instanceof HttpTransport
-            && $config['http_basic_auth']
-            && $config['http_basic_auth']['username']
-            && $config['http_basic_auth']['password'];
-
+            && isset($config['http_basic_auth'])
+            && is_array($config['http_basic_auth'])
+            && !empty($config['http_basic_auth']['username'])
+            && !empty($config['http_basic_auth']['password']);
     }
 
     protected function parseProcessors(array $config): array
@@ -163,6 +163,24 @@ class GelfLoggerFactory
 
     protected function getFallbackChannelName(): string
     {
-        return $this->app->bound('env') ? $this->app->environment() : 'production';
+        return $this->container->has('env')
+            ? $this->container->get('env')
+            : 'production';
+    }
+
+    protected function parseLevel(array $config): Level
+    {
+        $level = $config['level'] ?? 'debug';
+
+        if ($level instanceof Level) {
+            return $level;
+        }
+
+        return Level::fromName(ucfirst(strtolower($level)));
+    }
+
+    protected function parseChannelName(array $config): string
+    {
+        return $config['name'] ?? $this->getFallbackChannelName();
     }
 }

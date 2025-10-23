@@ -1,9 +1,11 @@
 <?php
 
-namespace Hedii\LaravelGelfLogger\Tests\Processors;
+declare(strict_types=1);
+
+namespace Nuwber\HypervelGelfLogger\Tests\Processors;
 
 use DateTimeImmutable;
-use Hedii\LaravelGelfLogger\Processors\RenameIdFieldProcessor;
+use Nuwber\HypervelGelfLogger\Processors\RenameIdFieldProcessor;
 use Monolog\Level;
 use Monolog\LogRecord;
 use PHPUnit\Framework\Attributes\DataProvider;

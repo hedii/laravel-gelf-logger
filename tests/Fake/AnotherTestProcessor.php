@@ -1,6 +1,8 @@
 <?php
 
-namespace Hedii\LaravelGelfLogger\Tests\Fake;
+declare(strict_types=1);
+
+namespace Nuwber\HypervelGelfLogger\Tests\Fake;
 
 use Monolog\LogRecord;
 

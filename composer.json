@@ -1,18 +1,18 @@
 {
-    "name": "hedii/laravel-gelf-logger",
-    "description": "A Laravel package to send logs to a gelf compatible backend like graylog",
+    "name": "nuwber/hypervel-gelf-logger",
+    "description": "A Hypervel package to send logs to a gelf compatible backend like graylog",
     "type": "library",
     "license": "MIT",
     "keywords": [
-        "hedii",
-        "laravel-gelf",
+        "nuwber",
+        "hypervel",
+        "hypervel-gelf",
         "gelf",
         "udp",
         "log",
         "logging",
         "graylog",
         "graylog2",
-        "laravel",
         "php"
     ],
     "authors": [
@@ -28,19 +28,25 @@
     "require": {
         "php": "^8.2",
         "graylog2/gelf-php": "^2.0",
-        "illuminate/log": "^12.0"
+        "hypervel/log": "^0.1"
     },
     "require-dev": {
-        "orchestra/testbench": "^10.0"
+        "hyperf/testing": "^3.1",
+        "phpunit/phpunit": "^10.0"
     },
     "autoload": {
         "psr-4": {
-            "Hedii\\LaravelGelfLogger\\": "src/"
+            "Nuwber\\HypervelGelfLogger\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Hedii\\LaravelGelfLogger\\Tests\\": "tests/"
+            "Nuwber\\HypervelGelfLogger\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "hyperf": {
+            "config": "Nuwber\\HypervelGelfLogger\\ConfigProvider"
         }
     },
     "config": {

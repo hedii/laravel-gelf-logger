@@ -1,23 +1,29 @@
 <?php
 
-namespace Hedii\LaravelGelfLogger\Tests;
+declare(strict_types=1);
+
+namespace Nuwber\HypervelGelfLogger\Tests;
 
 use Exception;
-use Hedii\LaravelGelfLogger\GelfLoggerFactory;
-use Orchestra\Testbench\TestCase as Orchestra;
+use Nuwber\HypervelGelfLogger\GelfLoggerFactory;
+use PHPUnit\Framework\TestCase as BaseTestCase;
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 
-class TestCase extends Orchestra
+abstract class TestCase extends BaseTestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
-    protected function getEnvironmentSetUp($app): void
+    protected ContainerInterface $container;
+    protected array $config = [];
+
+    protected function setUp(): void
     {
-        $app['config']->set('logging.default', 'gelf');
-        $app['config']->set('logging.channels.gelf', [
+        parent::setUp();
+
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->container->method('has')->willReturn(true);
+        $this->container->method('get')->with('env')->willReturn('testing');
+
+        $this->config = [
             'driver' => 'custom',
             'via' => GelfLoggerFactory::class,
             'level' => 'notice',
@@ -25,7 +31,13 @@ class TestCase extends Orchestra
             'host' => '127.0.0.2',
             'port' => 12202,
             'ignore_error' => false,
-        ]);
+        ];
+    }
+
+    protected function createLogger(array $config = []): \Monolog\Logger
+    {
+        $factory = new GelfLoggerFactory($this->container);
+        return $factory(array_merge($this->config, $config));
     }
 
     /**
@@ -62,13 +74,4 @@ class TestCase extends Orchestra
         }
     }
 
-    /**
-     * Merge a given config to the global config.
-     */
-    protected function mergeConfig(string $key, array $values): void
-    {
-        $config = $this->app['config'];
-
-        $config->set($key, array_merge($config->get($key), $values));
-    }
 }

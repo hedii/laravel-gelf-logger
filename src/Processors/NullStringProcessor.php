@@ -1,6 +1,8 @@
 <?php
 
-namespace Hedii\LaravelGelfLogger\Processors;
+declare(strict_types=1);
+
+namespace Nuwber\HypervelGelfLogger\Processors;
 
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;

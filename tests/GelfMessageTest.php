@@ -1,10 +1,10 @@
 <?php
 
-namespace Hedii\LaravelGelfLogger\Tests;
+declare(strict_types=1);
+
+namespace Nuwber\HypervelGelfLogger\Tests;
 
 use DateTimeImmutable;
-use Hedii\LaravelGelfLogger\GelfLoggerFactory;
-use Illuminate\Support\Facades\Log;
 use Monolog\Level;
 use Monolog\LogRecord;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,15 +14,13 @@ class GelfMessageTest extends TestCase
     #[Test]
     public function it_should_append_prefixes(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
+        $logger = $this->createLogger([
             'system_name' => 'my-system-namex',
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
             'context_prefix' => 'ctxt_',
             'extra_prefix' => 'extra_',
         ]);
 
-        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format(new LogRecord(
+        $formattedMessage = $logger->getHandlers()[0]->getFormatter()->format(new LogRecord(
             datetime: new DateTimeImmutable(),
             channel: 'gelf',
             level: Level::Debug,
@@ -40,13 +38,9 @@ class GelfMessageTest extends TestCase
     #[Test]
     public function it_should_not_append_prefixes(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'system_name' => 'my-system-namex',
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-        ]);
+        $logger = $this->createLogger(['system_name' => 'my-system-namex']);
 
-        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format(new LogRecord(
+        $formattedMessage = $logger->getHandlers()[0]->getFormatter()->format(new LogRecord(
             datetime: new DateTimeImmutable(),
             channel: 'gelf',
             level: Level::Debug,
@@ -62,15 +56,13 @@ class GelfMessageTest extends TestCase
     #[Test]
     public function null_config_variables_should_not_add_prefixes(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
+        $logger = $this->createLogger([
             'system_name' => 'my-system-namex',
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
             'context_prefix' => null,
             'extra_prefix' => null,
         ]);
 
-        $formattedMessage = Log::channel('gelf')->getHandlers()[0]->getFormatter()->format(new LogRecord(
+        $formattedMessage = $logger->getHandlers()[0]->getFormatter()->format(new LogRecord(
             datetime: new DateTimeImmutable(),
             channel: 'test_channel',
             level: Level::Debug,

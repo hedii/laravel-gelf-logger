@@ -1,6 +1,8 @@
 <?php
 
-namespace Hedii\LaravelGelfLogger\Tests;
+declare(strict_types=1);
+
+namespace Nuwber\HypervelGelfLogger\Tests;
 
 use Gelf\Publisher;
 use Gelf\Transport\HttpTransport;
@@ -8,8 +10,7 @@ use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\UdpTransport;
-use Hedii\LaravelGelfLogger\GelfLoggerFactory;
-use Illuminate\Support\Facades\Log;
+use Nuwber\HypervelGelfLogger\GelfLoggerFactory;
 use LogicException;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
@@ -22,9 +23,9 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_have_a_gelf_log_channel(): void
     {
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger();
 
-        $this->assertInstanceOf(Logger::class, $logger->getLogger());
+        $this->assertInstanceOf(Logger::class, $logger);
         $this->assertSame('my-custom-name', $logger->getName());
         $this->assertCount(1, $logger->getHandlers());
 
@@ -47,7 +48,7 @@ class GelfLoggerTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('You tried to pop from an empty processor stack.');
 
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger();
         $handler = $logger->getHandlers()[0];
 
         $handler->popProcessor();
@@ -56,13 +57,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_set_system_name_to_current_hostname_if_system_name_is_null(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'system_name' => null,
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['system_name' => null]);
 
         $this->assertSame(
             gethostname(),
@@ -73,13 +68,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_set_system_name_to_custom_value_if_system_name_config_is_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'system_name' => 'my-system-name',
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['system_name' => 'my-system-name']);
 
         $this->assertSame(
             'my-system-name',
@@ -90,13 +79,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_call_the_tcp_transport_method_when_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'transport' => 'tcp',
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['transport' => 'tcp']);
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
@@ -106,12 +89,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_call_the_udp_transport_method_when_nothing_is_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger();
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
@@ -121,13 +99,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_set_max_length_if_max_length_is_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-            'max_length' => 9999,
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['max_length' => 9999]);
 
         $this->assertSame(
             9999,
@@ -138,12 +110,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_use_default_max_length_when_max_length_is_not_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger();
 
         $this->assertSame(
             $this->getConstant(GelfMessageFormatter::class, 'DEFAULT_MAX_LENGTH'),
@@ -154,13 +121,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_use_default_max_length_when_max_length_is_null(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-            'max_length' => null,
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['max_length' => null]);
 
         $this->assertSame(
             $this->getConstant(GelfMessageFormatter::class, 'DEFAULT_MAX_LENGTH'),
@@ -171,13 +132,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_call_the_http_transport_method_when_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-            'transport' => 'http',
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['transport' => 'http']);
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
@@ -187,14 +142,10 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_set_path_if_path_is_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'path' => '/custom-path',
         ]);
-
-        $logger = Log::channel('gelf');
 
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
@@ -205,14 +156,10 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_set_path_to_default_path_if_path_is_null(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'path' => null,
         ]);
-
-        $logger = Log::channel('gelf');
 
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
@@ -226,13 +173,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_set_path_to_default_path_if_path_is_not_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-            'transport' => 'http',
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['transport' => 'http']);
 
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
@@ -246,9 +187,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_set_the_ssl_options_for_tcp_transport(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'tcp',
             'port' => 12202,
             'ssl' => true,
@@ -259,8 +198,6 @@ class GelfLoggerTest extends TestCase
                 'allow_self_signed' => true,
             ],
         ]);
-
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
@@ -276,9 +213,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_set_the_ssl_options_for_http_transport(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'port' => 443,
             'ssl' => true,
@@ -289,8 +224,6 @@ class GelfLoggerTest extends TestCase
                 'allow_self_signed' => true,
             ],
         ]);
-
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
@@ -307,9 +240,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_not_add_ssl_on_tcp_transport_when_the_ssl_config_is_missing_or_set_to_false(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'tcp',
             'port' => 1234,
             'ssl_options' => [
@@ -319,16 +250,12 @@ class GelfLoggerTest extends TestCase
                 'allow_self_signed' => true,
             ],
         ]);
-
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
         $this->assertNull($this->getAttribute($transport, 'sslOptions'));
 
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'tcp',
             'port' => 1234,
             'ssl' => false,
@@ -339,8 +266,6 @@ class GelfLoggerTest extends TestCase
                 'allow_self_signed' => true,
             ],
         ]);
-
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
@@ -350,9 +275,7 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_not_add_ssl_on_http_transport_when_the_ssl_config_is_missing_or_set_to_false(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'ssl_options' => [
                 'verify_peer' => false,
@@ -361,16 +284,12 @@ class GelfLoggerTest extends TestCase
                 'allow_self_signed' => true,
             ],
         ]);
-
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
         $this->assertNull($this->getAttribute($transport, 'sslOptions'));
 
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'ssl' => false,
             'ssl_options' => [
@@ -380,8 +299,6 @@ class GelfLoggerTest extends TestCase
                 'allow_self_signed' => true,
             ],
         ]);
-
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
@@ -391,15 +308,11 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_use_the_default_ssl_options_when_ssl_options_is_missing(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'tcp',
             'port' => 12202,
             'ssl' => true,
         ]);
-
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
@@ -411,15 +324,11 @@ class GelfLoggerTest extends TestCase
         $this->assertNull($sslOptions->getCaFile());
         $this->assertNull($sslOptions->getCiphers());
 
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'port' => 443,
             'ssl' => true,
         ]);
-
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
@@ -433,128 +342,89 @@ class GelfLoggerTest extends TestCase
     }
 
     #[Test]
-    public function it_should_ignore_errors_when_the_ignore_error_config_is_missing_or_set_to_false(): void
+    public function it_should_ignore_errors_when_the_ignore_error_config_is_missing_or_set_to_true(): void
     {
-        $this->app['config']->set('logging.default', 'gelf');
-        $this->app['config']->set('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-            'level' => 'notice',
-            'name' => 'my-custom-name',
-            'host' => '127.0.0.2',
-            'port' => 12202,
-        ]);
-
-        $logger = Log::channel('gelf');
+        // Test when ignore_error is not set (defaults to true in factory)
+        $config = $this->config;
+        unset($config['ignore_error']);
+        $factory = new GelfLoggerFactory($this->container);
+        $logger = $factory($config);
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
         $this->assertInstanceOf(IgnoreErrorTransportWrapper::class, $transport);
 
-        $this->app['config']->set('logging.default', 'gelf');
-        $this->app['config']->set('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-            'level' => 'notice',
-            'name' => 'my-custom-name',
-            'host' => '127.0.0.2',
-            'port' => 12202,
-            'ignore_error' => true,
-        ]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['ignore_error' => true]);
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
         $this->assertInstanceOf(IgnoreErrorTransportWrapper::class, $transport);
     }
 
+    #[Test]
     public function it_should_not_ignore_error_if_ignore_error_config_is_set_to_false(): void
     {
-        $this->app['config']->set('logging.default', 'gelf');
-        $this->mergeConfig('logging.channels.gelf', ['ignore_error' => false]);
-
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['ignore_error' => false]);
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 
-        $this->assertInstanceOf(TcpTransport::class, $transport);
+        $this->assertInstanceOf(UdpTransport::class, $transport);
     }
 
     #[Test]
     public function it_should_not_set_authentication_on_http_transport_if_http_basic_auth_is_not_fully_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
-            'transport' => 'http',
-        ]);
-        $logger = Log::channel('gelf');
+        $logger = $this->createLogger(['transport' => 'http']);
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
         $this->assertNull($this->getAttribute($transport, 'authentication'));
 
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'http_basic_auth' => 'foo',
         ]);
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
         $this->assertNull($this->getAttribute($transport, 'authentication'));
 
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'http_basic_auth' => [
                 'username' => '',
                 'password' => 'my_password',
             ],
         ]);
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
         $this->assertNull($this->getAttribute($transport, 'authentication'));
 
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'http_basic_auth' => [
                 'username' => 'my_username',
                 'password' => '',
             ],
         ]);
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
         $this->assertNull($this->getAttribute($transport, 'authentication'));
 
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'http_basic_auth' => [
                 'username' => 'my_username',
             ],
         ]);
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
         $this->assertNull($this->getAttribute($transport, 'authentication'));
 
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'http_basic_auth' => [
                 'password' => 'my_password',
             ],
         ]);
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
         $this->assertNull($this->getAttribute($transport, 'authentication'));
@@ -563,17 +433,13 @@ class GelfLoggerTest extends TestCase
     #[Test]
     public function it_should_set_authentication_on_http_transport_if_http_basic_auth_is_provided(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
-            'driver' => 'custom',
-            'via' => GelfLoggerFactory::class,
+        $logger = $this->createLogger([
             'transport' => 'http',
             'http_basic_auth' => [
                 'username' => 'my_username',
                 'password' => 'my_password',
             ],
         ]);
-
-        $logger = Log::channel('gelf');
         $publisher = $this->getAttribute($logger->getHandlers()[0], 'publisher');
         $transport = $publisher->getTransports()[0];
 

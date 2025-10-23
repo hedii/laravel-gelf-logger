@@ -1,10 +1,11 @@
 <?php
 
-namespace Hedii\LaravelGelfLogger\Tests;
+declare(strict_types=1);
 
-use Hedii\LaravelGelfLogger\Tests\Fake\AnotherTestProcessor;
-use Hedii\LaravelGelfLogger\Tests\Fake\TestProcessor;
-use Illuminate\Support\Facades\Log;
+namespace Nuwber\HypervelGelfLogger\Tests;
+
+use Nuwber\HypervelGelfLogger\Tests\Fake\AnotherTestProcessor;
+use Nuwber\HypervelGelfLogger\Tests\Fake\TestProcessor;
 use PHPUnit\Framework\Attributes\Test;
 
 class ProcessorTest extends TestCase
@@ -12,11 +13,9 @@ class ProcessorTest extends TestCase
     #[Test]
     public function it_should_have_the_configured_processors(): void
     {
-        $this->mergeConfig('logging.channels.gelf', [
+        $logger = $this->createLogger([
             'processors' => [TestProcessor::class, AnotherTestProcessor::class],
         ]);
-
-        $logger = Log::channel('gelf');
         $handler = $logger->getHandlers()[0];
 
         $this->assertInstanceOf(AnotherTestProcessor::class, $handler->popProcessor());
