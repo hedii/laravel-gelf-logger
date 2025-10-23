@@ -28,7 +28,8 @@
     "require": {
         "php": "^8.2",
         "graylog2/gelf-php": "^2.0",
-        "hypervel/log": "^0.1"
+        "hypervel/log": "^0.3.7",
+        "hypervel/laminas-mime": "^0.1.0"
     },
     "require-dev": {
         "hyperf/testing": "^3.1",
