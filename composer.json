@@ -26,12 +26,12 @@
         "source": "https://github.com/hedii/laravel-gelf-logger"
     },
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "graylog2/gelf-php": "^2.0",
-        "illuminate/log": "^12.0"
+        "illuminate/log": "^13.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^10.0"
+        "orchestra/testbench": "^11.0"
     },
     "autoload": {
         "psr-4": {
